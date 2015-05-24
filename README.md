@@ -11,3 +11,7 @@ iden_tohu : 遺伝奴
 tdn_huriko : 多重振り子1(失敗作)
 
 tohu_1 : 豆腐が落ちるだけ
+
+KkaiMathConNo1QB : K会数学コンテスト第1回問Bの何か
+
+
