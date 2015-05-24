@@ -6,9 +6,9 @@ int[] s;
 boolean[] v;
 
 void setup() {
-  int i, j;
+  int i, j, k;
   
-  v = new boolean[17];
+  v = new boolean[18];
   
   m = new int[n.length][v.length];
   s = new int[n.length];
@@ -17,36 +17,48 @@ void setup() {
     set_(n[i], 0, m[i]);
   }
   
-  for(i=0;i<v.length;i++) {
-    v[i] = (i<9);
-  }
+  ArrayList<String> str = new ArrayList<String>();
   
-  for(i=0;i<s.length;i++) {
-    s[i] = 0;
-  }
-  for(i=0;i<s.length;i++) {
-    for(j=0;j<v.length;j++) {
-      if(v[j])s[i] += m[i][j];
+  for(k=0;k<(1<<(v.length+1));k++) {
+    for(i=0;i<v.length;i++) {
+      v[i] = ((k/(1<<i))%2==1);
     }
-    s[i] %= n[i];
+    
+    for(i=0;i<s.length;i++) {s[i] = 0;}
+    boolean t=true;
+    for(i=0;i<s.length;i++) {
+      for(j=0;j<v.length;j++) {
+        if(v[j])s[i] += m[i][j];
+      }
+      if(s[i]%n[i]!=0){
+        t=false;
+        break;
+      }
+    }
+    
+    if(t) {
+      String val = "";
+      boolean t2=false;
+      for(i=v.length-1;!(i<0);i--) {
+        //val = val+(v[i]?"1":"0");
+        if(v[i]) {
+          val = val+"1";
+          if(!t2)t2=true;
+        }else if(t2)val = val+"0";
+      }
+      //println("number : "+val);
+      str.add(val);
+    }
   }
   
-  String val = "";
-  boolean t = false;
-  for(i=v.length-1;!(i<0);i--) {
-    if(v[i]) {
-      val = val+"1";
-      if(!t)t=true;
-    }else if(t)val = val+"0";
+  String[] res = new String[str.size()];
+  for(i=0;i<res.length;i++) {
+    res[i] = str.get(i);
   }
-  
-  println("number : "+val);
-  
-  for(i=0;i<n.length;i++) {
-    println(s[i]+" : mod "+n[i]);
-  }
+  saveStrings("result.txt", res);
   
   exit();
+  
 }
 
 void draw() {
