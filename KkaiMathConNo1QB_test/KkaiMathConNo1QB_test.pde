@@ -19,7 +19,7 @@ void setup() {
   
   ArrayList<String> str = new ArrayList<String>();
   
-  for(k=0;k<(1<<(v.length+1));k++) {
+  for(k=1;k<(1<<(v.length+1));k++) {
     for(i=0;i<v.length;i++) {
       v[i] = ((k/(1<<i))%2==1);
     }
