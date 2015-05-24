@@ -1,5 +1,5 @@
 
-int[] n = {19, 17, 13, 11, 7};
+int[] n = {13, 11, 9, 7};
 int[][] m;
 int[] s;
 
@@ -17,7 +17,7 @@ void setup() {
     set_(n[i], 0, m[i]);
   }
   
-  ArrayList<String> str = new ArrayList<String>();
+  //ArrayList<String> str = new ArrayList<String>();
   
   for(k=1;k<(1<<(v.length+1));k++) {
     for(i=0;i<v.length;i++) {
@@ -46,16 +46,19 @@ void setup() {
           if(!t2)t2=true;
         }else if(t2)val = val+"0";
       }
-      //println("number : "+val);
-      str.add(val);
+      println("number : "+val);
+      //str.add(val);
+      break;
     }
   }
   
+  /*
   String[] res = new String[str.size()];
   for(i=0;i<res.length;i++) {
     res[i] = str.get(i);
   }
   saveStrings("result.txt", res);
+  */
   
   exit();
   
