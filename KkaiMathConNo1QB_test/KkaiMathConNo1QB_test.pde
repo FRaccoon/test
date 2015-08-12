@@ -1,5 +1,5 @@
 
-int[] n = {13, 11, 9, 7};
+int[] n = {19, 17, 13, 11, 9, 7};
 int[][] m;
 int[] s;
 
@@ -8,7 +8,7 @@ boolean[] v;
 void setup() {
   int i, j, k;
   
-  v = new boolean[18];
+  v = new boolean[24];
   
   m = new int[n.length][v.length];
   s = new int[n.length];
