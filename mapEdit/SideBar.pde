@@ -23,6 +23,15 @@ class SideBar extends Box {
     
   }
   
+  void update() {
+    if(inside(mouseX, mouseY)) {
+      if((e.input.kw || e.input.kup) && a>0)a--;
+      if((e.input.ks || e.input.kdown) && a*e.c+s.y<ec.height)a++;
+      
+    }
+    
+  }
+  
   void draw() {
     image(ec, p.x, p.y-a*16);
     stroke(0);
@@ -42,7 +51,7 @@ class SideBar extends Box {
   
   void wheel_event(int delta) {
     a += delta;
-    if(a<0 || a>ec.height/e.c)a = 0;
+    if(a<0 || a*e.c>ec.height)a = 0;
     
   }
   

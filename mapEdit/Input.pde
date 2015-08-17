@@ -3,6 +3,7 @@ class Input {
   Editer e;
   
   boolean kw, ka, ks, kd;
+  boolean kup, kdown, kleft, kright;
   boolean md;
   
   Input(Editer e) {
@@ -19,6 +20,12 @@ class Input {
   
   void keyPressed() {
     if(key==CODED) {
+      switch(keyCode) {
+       case UP:kup=true;break;
+       case DOWN:kdown=true;break;
+       case LEFT:kleft=true;break;
+       case RIGHT:kright=true;break;
+      }
     }else {
       switch(key) {
        case 'w':kw=true;break;
@@ -31,6 +38,12 @@ class Input {
   
   void keyReleased() {
     if(key==CODED) {
+      switch(keyCode) {
+       case UP:kup=false;break;
+       case DOWN:kdown=false;break;
+       case LEFT:kleft=false;break;
+       case RIGHT:kright=false;break;
+      }
     }else {
       switch(key) {
        case 'w':kw=false;break;

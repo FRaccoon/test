@@ -21,6 +21,7 @@ class Editer {
   
   void update() {
     ml.update();
+    sb.update();
   }
   
   void draw() {

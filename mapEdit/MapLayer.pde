@@ -119,11 +119,11 @@ class MapLayer extends Box {
   }
   
   void update() {
-    if(inside(mouseX, mouseY)) { 
-      if(e.input.ka && a.x>0)a.x--;
-      if(e.input.kw && a.y>0)a.y--;
-      if(e.input.kd && a.x<m.x-c.x)a.x++;
-      if(e.input.ks && a.y<m.y-c.y)a.y++;
+    if(inside(mouseX, mouseY)) {
+      if((e.input.ka || e.input.kleft) && a.x>0)a.x--;
+      if((e.input.kw || e.input.kup) && a.y>0)a.y--;
+      if((e.input.kd || e.input.kright) && a.x<m.x-c.x)a.x++;
+      if((e.input.ks || e.input.kdown) && a.y<m.y-c.y)a.y++;
       
       if(e.input.md) { // edit
         // &&(get_px(mouseX)<m.x && get_py(mouseY)<m.y)
