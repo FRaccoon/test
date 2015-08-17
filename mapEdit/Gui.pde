@@ -7,12 +7,12 @@ class Gui {
   
   Gui(Editer e) {
     this.e = e;
-    bt_img = loadImage("btn057_10.png");
+    bt_img = loadImage("btn_img.png");
     
     bs = new Button[9];
     
     bs[0] = new Button(this, "", 5, 5);
-    String[] str = {"layer1", "layer2", "layer3", "mask", "save", "all", "pen", "eraser"};
+    String[] str = {"layer1", "layer2", "layer3", "mask", "save", "fill", "pen", "eraser"};
     for(int i=1;i<str.length+1;i++) {
       bs[i] = new Button(this, str[i-1], bs[i-1].p.x+bs[i-1].s.x, 30);
     }

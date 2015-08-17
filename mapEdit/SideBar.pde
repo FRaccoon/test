@@ -1,0 +1,50 @@
+
+class SideBar extends Box {
+  Editer e;
+  
+  int a; // (*, a) = top
+  
+  int mpx, mpy; // mouse_position
+  
+  PImage ec;
+  
+  SideBar(Editer e) {
+    this.e = e;
+    
+    p = new PVector(width-160, 0);
+    s = new PVector(160, height);
+    
+    mpx = 0;
+    mpy = 0;
+    
+    a = 0;
+    
+    ec = loadImage("base_img.png");
+    
+  }
+  
+  void draw() {
+    image(ec, p.x, p.y-a*16);
+    stroke(0);
+    fill(0,204,255,100);
+    rect(p.x+mpx*e.c, p.y+(mpy-a)*e.c, e.c, e.c);
+    
+  }
+  
+  boolean press_event(int mx, int my) {
+    if(!this.inside(mx, my))return false;
+    mpx = int((mouseX-p.x)/e.c);
+    mpy = int((mouseY-p.y)/e.c)+a;
+    
+    e.ml.paint(e.ml.chip, ec.get(mpx*e.c, mpy*e.c, e.c, e.c), 0, 0);
+    return true;
+  }
+  
+  void wheel_event(int delta) {
+    a += delta;
+    if(a<0 || a>ec.height/e.c)a = 0;
+    
+  }
+  
+}
+

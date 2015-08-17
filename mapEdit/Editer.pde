@@ -1,46 +1,38 @@
 
 class Editer {
-  int a, b;
   int c; // c:chip_size
   
   Gui gui;
-  MapLayer mapLayer;
+  MapLayer ml;
+  SideBar sb;
   Input input;
   
   Editer() {
-    a = 0;
-    b = 0;
-    
     c = 16;
     
     gui = new Gui(this);
-    mapLayer = new MapLayer(this);
+    sb = new SideBar(this);
+    ml = new MapLayer(this);
     input = new Input(this);
     
     //PFont font = loadFont("HGPMinchoB-20.vlw");
     
-    addMouseWheelListener( new MouseWheelListener() {
-      public void mouseWheelMoved(MouseWheelEvent mwe) {
-        mouseWheel( mwe.getWheelRotation() );
-      }
-    });
+  }
+  
+  void update() {
+    if( input.ka && ml.aX>0 )ml.aX--;
+    if( input.kw && ml.aY>0 )ml.aY--;
+    if( input.kd && ml.aX<ml.mX-ml.cX )ml.aX++;
+    if( input.ks && ml.aY<ml.mY-ml.cY )ml.aY++;
+    
+    ml.edit();
     
   }
   
   void draw() {
-    if( input.ka && mapLayer.edgeX>-160 )mapLayer.edgeX -= c;
-    if( input.kw && mapLayer.edgeY>-160 )mapLayer.edgeY -= c;
-    if( input.kd && mapLayer.edgeX<407 )mapLayer.edgeX += c;
-    if( input.ks && mapLayer.edgeY<560 )mapLayer.edgeY += c;
-    mapLayer.edit(mapLayer.now);
-    
+    ml.draw();
+    sb.draw();
     gui.draw();
-    
-    fill(255);
-    /*if( (mouseX<554)&&(mouseX>0)&&(mouseY>80)&&(mouseY<480) ) {
-       text(((mouseX/c*c+mapLayer.edgeX)/c+1)+"X"+((mouseY/c*c-80+mapLayer.edgeY)/c+1), 350, 50);
-    }*/
-    
   }
   
   void mousePressed(){

@@ -1,9 +1,9 @@
 
-class Button {
+class Button extends Box {
   Gui g;
-  PVector p, s;
   String ct;
   int cs;
+  boolean pr; // pressed
   
   Button(Gui g, String content, float px, float py) {
     this.g = g;
@@ -14,15 +14,22 @@ class Button {
     p = new PVector(px, py);
     s = new PVector((cs-2)*ct.length(), 20);
     
+    pr = false;
+    
   }
   
   void draw() {
+    
+    if(pr) {
+      tint(0, 255, 0);
+      pr = false;
+    }else if(this.selected())tint(255, 0, 0);
+    image(g.bt_img, p.x, p.y, s.x, s.y);
+    noTint();
+    
     textAlign(CENTER, CENTER);
     textSize(cs);
     fill(0);
-    if(this.selected())tint(255, 0, 0);
-    image(g.bt_img, p.x, p.y, s.x, 20);
-    noTint();
     text(ct, p.x+s.x*.5, p.y+s.y*.5);
     
   }
@@ -38,28 +45,30 @@ class Button {
       case 'l': // layer1~3
         for(int i=1;i<4;i++) {
           if(ct.charAt(5)==(i+'0')) {
-            r = (g.e.mapLayer.now==i);
+            r = (g.e.ml.now==i);
             break;
           }
         }
       break;
       case 'm': // mask
-        r = (g.e.mapLayer.now==0);
+        r = (g.e.ml.now==0);
       break;
       case 'p': // pen
-        r = (g.e.mapLayer.maskTool==1);
+        r = g.e.ml.mt;
       break;
-      case'e': // eraser
-        r = (g.e.mapLayer.maskTool==2);
+      case 'e': // eraser
+        r = !g.e.ml.mt;
       break;
-      default: // import, save, all
+      default: // import, save, fill
+        //r = inside(mouseX, mouseY);
       break;
     }
     return r;
   }
   
-  boolean press(int mx, int my) {
-    if( mx<p.x || mx>p.x+s.x || my<p.y || my>p.y+s.y )return false;
+  boolean press_event(int mx, int my) {
+    if(!this.inside(mx, my))return false;
+    pr = true;
     
     switch(ct.charAt(0)) {
       case 'i': // import
@@ -67,26 +76,25 @@ class Button {
       case 'l': // layer1~3
         for(int i=1;i<4;i++) {
           if(ct.charAt(5)==(i+'0')) {
-            g.e.mapLayer.now=i;
+            g.e.ml.now=i;
             break;
           }
         }
       break;
       case 'm': // mask
-        g.e.mapLayer.now = 0;
+        g.e.ml.now = 0;
       break;
       case 's': // save
-        g.e.mapLayer.save();
+        //g.e.ml.save();
       break;
-      case 'a': // all
-        g.e.mapLayer.saveLayer = loadImage("layer.png");
-        g.e.mapLayer.mask = loadImage("mask.png");
+      case 'f': // fill
+        g.e.ml.fill_paint(g.e.ml.layers[g.e.ml.now-1], g.e.ml.chip);
       break;
       case 'p': // pen
-        g.e.mapLayer.maskTool = 1;
+        g.e.ml.mt = true;
       break;
       case'e': // eraser
-        g.e.mapLayer.maskTool = 2;
+        g.e.ml.mt = false;
       break;
       default:
       break;

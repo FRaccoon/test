@@ -7,12 +7,19 @@ Editer editer;
 void setup(){
   size(720, 500);
   
+  addMouseWheelListener( new MouseWheelListener() {
+    public void mouseWheelMoved(MouseWheelEvent mwe) {
+      mouseWheel(mwe.getWheelRotation());
+    }
+  });
+  
   editer = new Editer();
   
 }
 
 void draw(){
   background(0);
+  editer.update();
   editer.draw();
 }
 
