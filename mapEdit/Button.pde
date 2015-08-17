@@ -72,6 +72,7 @@ class Button extends Box {
     
     switch(ct.charAt(0)) {
       case 'i': // import
+        g.e.ml.imp();
       break;
       case 'l': // layer1~3
         for(int i=1;i<4;i++) {
@@ -88,7 +89,9 @@ class Button extends Box {
         g.e.ml.save();
       break;
       case 'f': // fill
-        g.e.ml.fill_paint(g.e.ml.layers[g.e.ml.now-1], g.e.ml.chip);
+        if(g.e.ml.now==0)g.e.ml.fill_color(g.e.ml.mask, (g.e.ml.mt?color(0):color(255)));
+        else g.e.ml.fill_paint(g.e.ml.layers[g.e.ml.now-1], g.e.ml.chip);
+        
       break;
       case 'p': // pen
         g.e.ml.mt = true;
@@ -103,3 +106,4 @@ class Button extends Box {
   }
   
 }
+

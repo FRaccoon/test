@@ -23,6 +23,9 @@ class Gui extends Box {
     bs[0].set_ct("import");
   }
   
+  void update() {
+  }
+  
   void draw(){
     for(int i=0;i<bs.length;i++) {
       bs[i].draw();

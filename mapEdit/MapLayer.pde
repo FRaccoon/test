@@ -135,6 +135,11 @@ class MapLayer extends Box {
     
   }
   
+  void imp() { // import
+    paint(layers[this.now-1], loadImage("./data/o/layer.png"), 0, 0);
+    paint(mask, loadImage("./data/o/mask.png"), 0, 0);
+  }
+  
   void save() {
     PGraphics sl = createGraphics(m.x*e.c, m.y*e.c); //save_layer
     sl.beginDraw();

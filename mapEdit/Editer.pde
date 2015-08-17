@@ -22,6 +22,7 @@ class Editer {
   void update() {
     ml.update();
     sb.update();
+    gui.update();
   }
   
   void draw() {
@@ -51,3 +52,4 @@ class Editer {
   }
   
 }
+
