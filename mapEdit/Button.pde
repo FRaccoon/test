@@ -5,14 +5,14 @@ class Button extends Box {
   int cs;
   boolean pr; // pressed
   
-  Button(Gui g, String content, float px, float py) {
+  Button(Gui g, String content, int px, int py) {
     this.g = g;
     
     this.ct = content;
     cs = 12;
     
-    p = new PVector(px, py);
-    s = new PVector((cs-2)*ct.length(), 20);
+    p = new IVector(px, py);
+    s = new IVector((cs-2)*ct.length(), 20);
     
     pr = false;
     

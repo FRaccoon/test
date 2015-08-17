@@ -2,9 +2,9 @@
 class MapLayer extends Box {
   Editer e;
   
-  int mX, mY; // map_size
-  int cX, cY; // canvas_size
-  int aX, aY; // (aX, aY) = (0, 0)
+  IVector m; // map_size
+  IVector c; // canvas_size
+  IVector a; // (a.x, a.y) = (0, 0)
   int now;
   PImage[] layers;
   PImage chip;
@@ -17,43 +17,41 @@ class MapLayer extends Box {
   MapLayer(Editer e) {
     this.e = e;
     
-    p = new PVector(0, 80);
-    s = new PVector(e.c*34, e.c*25);
+    p = new IVector(0, 80);
+    s = new IVector(e.c*34, e.c*25);
     
     layer_size(); // set mX, mY
     
-    cX = 34;
-    cY = 25;
+    c = new IVector(34, 25);
     
-    aX = 0;
-    aY = 0;
+    a = new IVector(0, 0);
     
     now = 1;
     
     mt = false;
     
-    bg_img = createImage(cX*e.c, cY*e.c, RGB);
+    bg_img = createImage(c.x*e.c, c.y*e.c, RGB);
     fill_paint(bg_img, loadImage("./data/bg_img.png"));
     
     layers = new PImage[3];
     for(int i=0;i<layers.length;i++) {
-      layers[i] = createImage(mX*e.c, mY*e.c, ARGB);
+      layers[i] = createImage(m.x*e.c, m.y*e.c, ARGB);
     }
     
     chip = createImage(e.c, e.c, ARGB);
     paint(chip, e.sb.ec.get(0,0,e.c,e.c), 0, 0);
     
-    mask = createImage(mX*e.c, mY*e.c, RGB);
+    mask = createImage(m.x*e.c, m.y*e.c, RGB);
     fill_color(mask, color(255));
     
   }
   
   int get_px(int vx) {
-    return int((vx-p.x)/e.c)+aX;
+    return ((vx-p.x)/e.c)+a.x;
   }
   
   int get_py(int vy) {
-    return int((vy-p.y)/e.c)+aY;
+    return ((vy-p.y)/e.c)+a.y;
   }
   
   void paint(PImage canvas, PImage mat, int sx, int sy) {
@@ -104,10 +102,10 @@ class MapLayer extends Box {
   void draw() {
     image(bg_img, p.x, p.y);
     if(this.now==0) {
-      image(mask.get(aX*e.c, aY*e.c, min((mX-aX)*e.c, cX*e.c), min((mY-aY)*e.c, cY*e.c)), p.x, p.y);
+      image(mask.get(a.x*e.c, a.y*e.c, min((m.x-a.x)*e.c, c.x*e.c), min((m.y-a.y)*e.c, c.y*e.c)), p.x, p.y);
     }else {
       for(int i=0;i<this.now;i++){
-        image(layers[i].get(aX*e.c, aY*e.c, min((mX-aX)*e.c, cX*e.c), min((mY-aY)*e.c, cY*e.c)), p.x, p.y);
+        image(layers[i].get(a.x*e.c, a.y*e.c, min((m.x-a.x)*e.c, c.x*e.c), min((m.y-a.y)*e.c, c.y*e.c)), p.x, p.y);
       }
     }
     
@@ -120,16 +118,25 @@ class MapLayer extends Box {
     
   }
   
-  void edit() {
-    if(e.input.md && inside(mouseX, mouseY)) { // &&(get_px(mouseX)<mX && get_py(mouseY)<mY)
-      if(this.now!=0)paint(layers[this.now-1], chip, get_px(mouseX)*e.c, get_py(mouseY)*e.c);
-      paint_color(mask, (mt?color(0):color(255)), get_px(mouseX)*e.c, get_py(mouseY)*e.c, e.c, e.c);
+  void update() {
+    if(inside(mouseX, mouseY)) { 
+      if(e.input.ka && a.x>0)a.x--;
+      if(e.input.kw && a.y>0)a.y--;
+      if(e.input.kd && a.x<m.x-c.x)a.x++;
+      if(e.input.ks && a.y<m.y-c.y)a.y++;
+      
+      if(e.input.md) { // edit
+        // &&(get_px(mouseX)<m.x && get_py(mouseY)<m.y)
+        if(this.now!=0)paint(layers[this.now-1], chip, get_px(mouseX)*e.c, get_py(mouseY)*e.c);
+        paint_color(mask, (mt?color(0):color(255)), get_px(mouseX)*e.c, get_py(mouseY)*e.c, e.c, e.c);
+      }
+      
     }
     
   }
   
   void save() {
-    PGraphics sl = createGraphics(mX*e.c, mY*e.c); //save_layer
+    PGraphics sl = createGraphics(m.x*e.c, m.y*e.c); //save_layer
     sl.beginDraw();
     //sl.background(0);
     for(int i=0;i<this.now;i++) {
@@ -166,8 +173,9 @@ class MapLayer extends Box {
     }catch(NumberFormatException e){
     }catch(NullPointerException e){
     }
-    this.mX = (gX==0?50:gX);
-    this.mY = (gY==0?50:gY);
+    
+    m = new IVector((gX==0?50:gX), (gY==0?50:gY));
+    
   }
   
 }

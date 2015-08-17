@@ -11,8 +11,8 @@ class SideBar extends Box {
   SideBar(Editer e) {
     this.e = e;
     
-    p = new PVector(width-160, 0);
-    s = new PVector(160, height);
+    p = new IVector(width-160, 0);
+    s = new IVector(160, height);
     
     mpx = 0;
     mpy = 0;
@@ -33,8 +33,8 @@ class SideBar extends Box {
   
   boolean press_event(int mx, int my) {
     if(!this.inside(mx, my))return false;
-    mpx = int((mouseX-p.x)/e.c);
-    mpy = int((mouseY-p.y)/e.c)+a;
+    mpx = ((mouseX-p.x)/e.c);
+    mpy = ((mouseY-p.y)/e.c)+a;
     
     e.ml.paint(e.ml.chip, ec.get(mpx*e.c, mpy*e.c, e.c, e.c), 0, 0);
     return true;

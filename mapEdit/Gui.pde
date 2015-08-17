@@ -1,5 +1,5 @@
 
-class Gui {
+class Gui extends Box {
   Editer e;
   
   PImage bt_img;
@@ -7,6 +7,10 @@ class Gui {
   
   Gui(Editer e) {
     this.e = e;
+    
+    p = new IVector(0, 0);
+    s = new IVector(width-160, 80);
+    
     bt_img = loadImage("btn_img.png");
     
     bs = new Button[9];
@@ -26,11 +30,20 @@ class Gui {
     
   }
   
-  void Scrollbar(int x, int y, int widthScrollbar, float part) {
+  boolean press_event(int mx, int my) {
+    if(!this.inside(mx, my))return false;
+    
+    for(int i=0;i<e.gui.bs.length;i++) {
+      if(bs[i].press_event(mx, my))break;
+    }
+    return true;
+  }
+  
+  /*void Scrollbar(int x, int y, int widthScrollbar, float part) {
      fill(0);
      triangle(x+4, y+2, x+12, y+2, x+8, y+(sqrt(3)*5)+2);
      triangle(x+4, y+widthScrollbar-2, x+12, y+widthScrollbar-2, x+8, y-(sqrt(3)*5)+widthScrollbar-2);
-  }
+  }*/
   
 }
 

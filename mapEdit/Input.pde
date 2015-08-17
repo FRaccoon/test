@@ -48,11 +48,8 @@ class Input {
   
   void mouseReleased() {
     md = false;
-    
     if(e.sb.press_event(mouseX, mouseY))return;
-    for(int i=0;i<e.gui.bs.length;i++) {
-      if(e.gui.bs[i].press_event(mouseX, mouseY))return;
-    }
+    if(e.gui.press_event(mouseX, mouseY))return;
     
   }
   

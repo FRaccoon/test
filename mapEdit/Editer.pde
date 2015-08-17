@@ -20,13 +20,7 @@ class Editer {
   }
   
   void update() {
-    if( input.ka && ml.aX>0 )ml.aX--;
-    if( input.kw && ml.aY>0 )ml.aY--;
-    if( input.kd && ml.aX<ml.mX-ml.cX )ml.aX++;
-    if( input.ks && ml.aY<ml.mY-ml.cY )ml.aY++;
-    
-    ml.edit();
-    
+    ml.update();
   }
   
   void draw() {
