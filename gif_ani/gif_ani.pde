@@ -9,9 +9,9 @@ void setup() {
   //size(200, 200);
   //background(0);
   
-  inp = "import/img_";
+  inp = "./data/import/img_";
   ext = ".png";
-  exp = "export/exp";
+  exp = "./data/export/exp";
   
   wid = 0;
   hei = 0;

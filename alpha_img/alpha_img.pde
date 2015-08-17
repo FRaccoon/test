@@ -6,7 +6,7 @@ void setup() {
   
   b = true;
   
-  img1 = loadImage("i.jpg");
+  img1 = loadImage("./data/i.jpg");
   
   img0 = createImage(img1.width, img1.height, ARGB);
   
@@ -23,7 +23,7 @@ void setup() {
   
   img0.updatePixels();
   
-  img0.save("we193s.png");
+  img0.save("./data/o.png");
   //exit();
   
   size(img0.width, img0.height);

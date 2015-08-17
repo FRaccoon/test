@@ -44,11 +44,7 @@ class MapLayer extends Box {
     paint(chip, e.sb.ec.get(0,0,e.c,e.c), 0, 0);
     
     mask = createImage(mX*e.c, mY*e.c, RGB);
-    mask.loadPixels();
-    for(int i=0;i<mask.pixels.length;i++) {
-      mask.pixels[i] = color(255);
-    }
-    mask.updatePixels();
+    fill_color(mask, color(255));
     
   }
   
@@ -85,6 +81,14 @@ class MapLayer extends Box {
     canvas.updatePixels();
     mat.updatePixels();
     
+  }
+  
+  void fill_color(PImage canvas, color col) {
+    canvas.loadPixels();
+    for(int i=0;i<canvas.pixels.length;i++) {
+        canvas.pixels[i] = col;
+    }
+    canvas.updatePixels();
   }
   
   void paint_color(PImage canvas, color col, int sx, int sy, int ex, int ey) {
@@ -132,8 +136,10 @@ class MapLayer extends Box {
       sl.image(layers[i], 0, 0);
     }
     sl.endDraw();
-    sl.save("./output/layer.png");
-    mask.save("./output/mask.png");
+    
+    sl.get().save("./data/o/layer.png");
+    mask.get().save("./data/o/mask.png");
+    //exit();
   }
   
   void layer_size() { //このクラスはjavaで作られてます?

@@ -85,7 +85,7 @@ class Button extends Box {
         g.e.ml.now = 0;
       break;
       case 's': // save
-        //g.e.ml.save();
+        g.e.ml.save();
       break;
       case 'f': // fill
         g.e.ml.fill_paint(g.e.ml.layers[g.e.ml.now-1], g.e.ml.chip);
