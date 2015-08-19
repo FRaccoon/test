@@ -4,8 +4,20 @@ class Box {
   
   Box() {}
   
-  boolean inside(int mx, int my) {
-    return mx>p.x && mx<p.x+s.x && my>p.y && my<p.y+s.y;
+  boolean inside(int px, int py) {
+    return px(px)>0 && px(px)<s.x && py(py)>0 && py(py)<s.y;
+  }
+  
+  int px(int px) {return px - p.x;}
+  int py(int py) {return py - p.y;}
+  
+  int cx(int cx) {return cx + p.x;}
+  int cy(int cy) {return cy + p.y;}
+  
+  void area() {
+    noFill();
+    stroke(255);
+    rect(cx(0), cy(0), s.x, s.y);
   }
   
 }
@@ -17,6 +29,8 @@ class IVector { // int_vector
     this.x = x;
     this.y = y;
   }
+  
+  void print() {println("x: "+x+", y: "+y);} // debug
   
 }
 
