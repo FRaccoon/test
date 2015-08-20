@@ -3,7 +3,7 @@ class Input {
   Editer e;
   
   boolean kw, ka, ks, kd;
-  boolean kup, kdown, kleft, kright;
+  boolean kup, kdown, kleft, kright, kshift;
   boolean md;
   
   Input(Editer e) {
@@ -25,6 +25,7 @@ class Input {
        case DOWN:kdown=true;break;
        case LEFT:kleft=true;break;
        case RIGHT:kright=true;break;
+       case SHIFT:kshift=true;break;
       }
     }else {
       switch(key) {
@@ -43,6 +44,7 @@ class Input {
        case DOWN:kdown=false;break;
        case LEFT:kleft=false;break;
        case RIGHT:kright=false;break;
+       case SHIFT:kshift=false;break;
       }
     }else {
       switch(key) {

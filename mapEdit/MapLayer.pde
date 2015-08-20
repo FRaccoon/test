@@ -9,6 +9,7 @@ class MapLayer extends Box {
   int now;
   
   Layer chip;
+  IVector cs; // chip_size
   boolean mt; // mask_tool true: pen(black), false: eraser(white)
   
   MapLayer(Editer e) {
@@ -26,8 +27,14 @@ class MapLayer extends Box {
     mt = true;
     
     chip = new Layer(this.e, new IVector(1, 1));
-    chip.paint(e.sb.ec.get(0,0,e.c,e.c), 0, 0);
+    cs = new IVector(1, 1);
+    set_chip(e.sb.ec, new IVector(0, 0));
     
+  }
+  
+  void set_chip(PImage mat, IVector ps) {
+    chip.set_size(cs);
+    chip.paint(mat.get(ps.x*e.c, ps.y*e.c, cs.x*e.c, cs.y*e.c), 0, 0);
   }
   
   void draw() {
@@ -113,8 +120,8 @@ class Layers extends Box {
   int cx(int cx) {return ml.cx(cx + p.x);}
   int cy(int cy) {return ml.cy(cy + p.y);}
   
-  int mx(int px) {return (px(px)/ml.e.c)+a.x;}
-  int my(int py) {return (py(py)/ml.e.c)+a.y;}
+  int mx(int px) {return (px(px-(ml.cs.x-1)*ml.e.c/2)/ml.e.c)+a.x;}
+  int my(int py) {return (py(py-(ml.cs.y-1)*ml.e.c/2)/ml.e.c)+a.y;}
   
   void draw() {
    bg_img.draw((Box)this);
@@ -128,7 +135,7 @@ class Layers extends Box {
     
     if(inside(mouseX, mouseY)){
       fill(0, 204, 255, 100);
-      rect((mx(mouseX)-a.x)*ml.e.c+cx(0), (my(mouseY)-a.y)*ml.e.c+cy(0), ml.e.c, ml.e.c);
+      rect((mx(mouseX)-a.x)*ml.e.c+cx(0), (my(mouseY)-a.y)*ml.e.c+cy(0), ml.cs.x*ml.e.c, ml.cs.y*ml.e.c);
       
       if(ml.e.d) {
         textAlign(RIGHT, TOP);textSize(12);fill(255);
@@ -148,8 +155,11 @@ class Layers extends Box {
     
     if(ml.e.i.md) { // edit
       // &&(get_px(mouseX)<m.x && get_py(mouseY)<m.y)
-      if(ml.now==0)mask.paint_color(ml.mt?color(0):color(255), mx(mouseX)*ml.e.c, my(mouseY)*ml.e.c, ml.e.c, ml.e.c);
-      else ls[ml.now-1].paint(ml.chip.l, mx(mouseX)*ml.e.c, my(mouseY)*ml.e.c);
+      if(ml.now==0)mask.paint_color(ml.mt?color(0):color(255), mx(mouseX)*ml.e.c, my(mouseY)*ml.e.c, ml.cs.x*ml.e.c, ml.cs.y*ml.e.c);
+      else {
+        if(ml.mt)ls[ml.now-1].paint(ml.chip.l, mx(mouseX)*ml.e.c, my(mouseY)*ml.e.c);
+        else ls[ml.now-1].paint_color(color(0, 0), mx(mouseX)*ml.e.c, my(mouseY)*ml.e.c, ml.cs.x*ml.e.c, ml.cs.y*ml.e.c);
+      }
     }
     
     return true;
@@ -162,7 +172,10 @@ class Layers extends Box {
   
   void fill_layer(int num) {
     if(num==0)mask.fill_color(ml.mt?color(0):color(255));
-    else ls[num-1].fill_paint(ml.chip.l);
+    else {
+      if(ml.mt)ls[num-1].fill_paint(ml.chip.l);
+      else ls[num-1].fill_color(color(0, 0));
+    }
   }
   
   void save() {
@@ -188,6 +201,10 @@ class Layer {
   
   Layer(Editer e, IVector s) {
     this.e = e;
+    l = createImage(s.x*e.c, s.y*e.c, ARGB);
+  }
+  
+  void set_size(IVector s) {
     l = createImage(s.x*e.c, s.y*e.c, ARGB);
   }
   

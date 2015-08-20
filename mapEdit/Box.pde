@@ -30,6 +30,11 @@ class IVector { // int_vector
     this.y = y;
   }
   
+  void set(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+  
   void print() {println("x: "+x+", y: "+y);} // debug
   
 }
