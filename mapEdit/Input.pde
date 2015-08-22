@@ -14,6 +14,12 @@ class Input {
     ks = false;
     kd = false;
     
+    kup = false;
+    kdown = false;
+    kleft = false;
+    kright = false;
+    kshift = false;
+    
     md = false;
     
   }
@@ -26,6 +32,7 @@ class Input {
        case LEFT:kleft=true;break;
        case RIGHT:kright=true;break;
        case SHIFT:kshift=true;break;
+       default:break;
       }
     }else {
       switch(key) {
@@ -33,6 +40,7 @@ class Input {
        case 'a':ka=true;break;
        case 's':ks=true;break;
        case 'd':kd=true;break;
+       default:break;
       }
     }
   }
@@ -45,6 +53,7 @@ class Input {
        case LEFT:kleft=false;break;
        case RIGHT:kright=false;break;
        case SHIFT:kshift=false;break;
+       default:break;
       }
     }else {
       switch(key) {
@@ -52,18 +61,21 @@ class Input {
        case 'a':ka=false;break;
        case 's':ks=false;break;
        case 'd':kd=false;break;
+       default:break;
       }
     }
   }
   
   void mousePressed() {
+    if(!md)e.sb.press_event(mouseX, mouseY);
+    
     md = true;
     
   }
   
   void mouseReleased() {
     md = false;
-    if(e.sb.press_event(mouseX, mouseY))return;
+    if(e.sb.release_event(mouseX, mouseY))return;
     if(e.g.press_event(mouseX, mouseY))return;
     
   }

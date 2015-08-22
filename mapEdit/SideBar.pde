@@ -5,6 +5,7 @@ class SideBar extends Box {
   int a; // (*, a) = top
   
   IVector mp; // mouse_position
+  boolean pr; // mouse_press
   
   PImage ec;
   
@@ -17,6 +18,8 @@ class SideBar extends Box {
     mp = new IVector(0, 0);
     
     a = 0;
+    
+    pr = false;
     
     ec = loadImage("base_img.png");
     
@@ -36,7 +39,11 @@ class SideBar extends Box {
     
     stroke(255);
     fill(0, 204, 255, 100);
-    rect(cx(0)+mp.x*e.c, cy(0)+(mp.y-a)*e.c, e.ml.cs.x*e.c, e.ml.cs.y*e.c);
+    if(pr) {
+      rect(cx(0)+mp.x*e.c, cy(0)+(mp.y-a)*e.c, px(mouseX)-mp.x*e.c, py(mouseY)-(mp.y-a)*e.c);
+    }else {
+      rect(cx(0)+mp.x*e.c, cy(0)+(mp.y-a)*e.c, e.ml.cs.x*e.c, e.ml.cs.y*e.c);
+    }
     
     if(e.d)area();
   }
@@ -44,14 +51,25 @@ class SideBar extends Box {
   boolean press_event(int mx, int my) {
     if(!this.inside(mx, my))return false;
     
-    if(e.i.kshift) {
-      IVector np = new IVector(max(mp.x, px(mouseX)/e.c), max(mp.y, (py(mouseY)/e.c)+a));
-      mp.set(min(mp.x, px(mouseX)/e.c), min(mp.y, (py(mouseY)/e.c)+a));
-      e.ml.cs.set(np.x-mp.x+1, np.y-mp.y+1);
-    }else {
-      mp.set(px(mouseX)/e.c, (py(mouseY)/e.c)+a);
-      e.ml.cs.set(1, 1);
-    }
+    pr = true;
+    
+    mp.set(px(mouseX)/e.c, (py(mouseY)/e.c)+a);
+    e.ml.cs.set(0, 0);
+    
+    e.ml.set_chip(ec, mp);
+    
+    return true;
+  }
+  
+  
+  boolean release_event(int mx, int my) {
+    pr = false;
+    if(!this.inside(mx, my))return false;
+    
+    IVector np = new IVector(max(mp.x, px(mouseX)/e.c), max(mp.y, (py(mouseY)/e.c)+a));
+    mp.set(min(mp.x, px(mouseX)/e.c), min(mp.y, (py(mouseY)/e.c)+a));
+    e.ml.cs.set(np.x-mp.x+1, np.y-mp.y+1);
+    
     e.ml.set_chip(ec, mp);
     
     return true;

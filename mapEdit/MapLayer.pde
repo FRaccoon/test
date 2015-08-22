@@ -127,6 +127,11 @@ class Layers extends Box {
    bg_img.draw((Box)this);
     if(ml.now==0) {
       mask.draw((Box)this, a);
+      tint(255, 100);
+      for(int i=0;i<ls.length;i++){
+        ls[i].draw((Box)this, a);
+      }
+      noTint();
     }else {
       for(int i=0;i<ml.now;i++){
         ls[i].draw((Box)this, a);
@@ -134,6 +139,7 @@ class Layers extends Box {
     }
     
     if(inside(mouseX, mouseY)){
+      stroke(0);
       fill(0, 204, 255, 100);
       rect((mx(mouseX)-a.x)*ml.e.c+cx(0), (my(mouseY)-a.y)*ml.e.c+cy(0), ml.cs.x*ml.e.c, ml.cs.y*ml.e.c);
       
