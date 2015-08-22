@@ -34,13 +34,18 @@ class SideBar extends Box {
     
   }
   
+  int mx(int px) {return (px(px)/e.c);}
+  int my(int py) {return (py(py)/e.c)+a;}
+  
   void draw() {
     image(ec.get(0, a*e.c, s.x, s.y), cx(0), cy(0));
     
     stroke(255);
     fill(0, 204, 255, 100);
     if(pr) {
-      rect(cx(0)+mp.x*e.c, cy(0)+(mp.y-a)*e.c, px(mouseX)-mp.x*e.c, py(mouseY)-(mp.y-a)*e.c);
+      IVector xp = new IVector(max(mp.x, mx(mouseX)), max(mp.y, my(mouseY))),
+      ip = new IVector(min(mp.x, mx(mouseX)), min(mp.y, my(mouseY)));
+      rect(cx(0)+ip.x*e.c, cy(0)+(ip.y-a)*e.c, (xp.x-ip.x+1)*e.c, (xp.y-ip.y-a+1)*e.c);
     }else {
       rect(cx(0)+mp.x*e.c, cy(0)+(mp.y-a)*e.c, e.ml.cs.x*e.c, e.ml.cs.y*e.c);
     }
@@ -53,7 +58,7 @@ class SideBar extends Box {
     
     pr = true;
     
-    mp.set(px(mouseX)/e.c, (py(mouseY)/e.c)+a);
+    mp.set(mx(mouseX), my(mouseY));
     e.ml.cs.set(0, 0);
     
     e.ml.set_chip(ec, mp);
@@ -66,8 +71,8 @@ class SideBar extends Box {
     pr = false;
     if(!this.inside(mx, my))return false;
     
-    IVector np = new IVector(max(mp.x, px(mouseX)/e.c), max(mp.y, (py(mouseY)/e.c)+a));
-    mp.set(min(mp.x, px(mouseX)/e.c), min(mp.y, (py(mouseY)/e.c)+a));
+    IVector np = new IVector(max(mp.x, mx(mouseX)), max(mp.y, my(mouseY)));
+    mp.set(min(mp.x, mx(mouseX)), min(mp.y, my(mouseY)));
     e.ml.cs.set(np.x-mp.x+1, np.y-mp.y+1);
     
     e.ml.set_chip(ec, mp);
