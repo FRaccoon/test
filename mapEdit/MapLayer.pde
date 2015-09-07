@@ -159,7 +159,7 @@ class Layers extends Box {
     if((ml.e.i.kd || ml.e.i.kright) && a.x<m.x-c.x)a.x++;
     if((ml.e.i.ks || ml.e.i.kdown) && a.y<m.y-c.y)a.y++;
     
-    if(ml.e.i.md) { // edit
+    if(ml.e.i.md && !ml.e.sb.pr) { // edit
       // &&(get_px(mouseX)<m.x && get_py(mouseY)<m.y)
       if(ml.now==0)mask.paint_color(ml.mt?color(0):color(255), mx(mouseX)*ml.e.c, my(mouseY)*ml.e.c, ml.cs.x*ml.e.c, ml.cs.y*ml.e.c);
       else {
@@ -204,14 +204,23 @@ class Layers extends Box {
 class Layer {
   Editer e;
   PImage l;
+  IVector s;
+  IVector[][] c;
   
   Layer(Editer e, IVector s) {
     this.e = e;
-    l = createImage(s.x*e.c, s.y*e.c, ARGB);
+    set_size(s);
   }
   
-  void set_size(IVector s) {
-    l = createImage(s.x*e.c, s.y*e.c, ARGB);
+  void set_size(IVector ss) {
+    l = createImage(ss.x*e.c, ss.y*e.c, ARGB);
+    this.s = ss;
+    this.m = new IVector[s.x][s.y];
+    for(int i=0;s.x;i++) {
+      for(int j=0;j<s.y;j++) {
+        mi[i][j] = new IVector(-1, -1);
+      }
+    }
   }
   
   void draw(Box b) {

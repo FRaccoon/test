@@ -59,7 +59,7 @@ class SideBar extends Box {
     pr = true;
     
     mp.set(mx(mouseX), my(mouseY));
-    e.ml.cs.set(0, 0);
+    e.ml.cs.set(1, 1);
     
     e.ml.set_chip(ec, mp);
     
