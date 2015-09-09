@@ -1,45 +1,37 @@
-import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
 
-Editer editer;
+MEditer mediter;
 
 void setup(){
   size(720, 500);
   
-  addMouseWheelListener( new MouseWheelListener() {
-    public void mouseWheelMoved(MouseWheelEvent mwe) {
-      mouseWheel(mwe.getWheelRotation());
-    }
-  });
-  
-  editer = new Editer();
+  mediter = new MEditer();
   
 }
 
 void draw(){
   background(0);
-  editer.update();
-  editer.draw();
+  mediter.update();
+  mediter.draw();
 }
 
 void mousePressed(){
-  editer.mousePressed();
+  mediter.mousePressed();
 }
 
 void mouseReleased(){
-  editer.mouseReleased();
+  mediter.mouseReleased();
 }
 
-void mouseWheel(int delta){
-  editer.mouseWheel(delta);
+void mouseWheel(MouseEvent event) {
+  mediter.mouseWheel(event.getCount());
 }
 
 void keyPressed(){
-  editer.keyPressed();
+  mediter.keyPressed();
 }
 
 void keyReleased(){
-  editer.keyReleased();
+  mediter.keyReleased();
 }
-

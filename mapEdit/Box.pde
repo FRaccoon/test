@@ -38,4 +38,3 @@ class IVector { // int_vector
   void print() {println("x: "+x+", y: "+y);} // debug
   
 }
-

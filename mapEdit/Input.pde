@@ -1,12 +1,12 @@
 
 class Input {
-  Editer e;
+  MEditer e;
   
   boolean kw, ka, ks, kd;
   boolean kup, kdown, kleft, kright, kshift;
   boolean md;
   
-  Input(Editer e) {
+  Input(MEditer e) {
     this.e = e;
     
     kw = false;
@@ -86,4 +86,3 @@ class Input {
   }
   
 }
-

@@ -1,6 +1,6 @@
 
 class SideBar extends Box {
-  Editer e;
+  MEditer e;
   
   int a; // (*, a) = top
   
@@ -9,7 +9,7 @@ class SideBar extends Box {
   
   PImage ec;
   
-  SideBar(Editer e) {
+  SideBar(MEditer e) {
     this.e = e;
     
     p = new IVector(width-e.c*10, 0);
@@ -87,4 +87,3 @@ class SideBar extends Box {
   }
   
 }
-

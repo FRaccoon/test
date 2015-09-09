@@ -1,11 +1,11 @@
 
 class Gui extends Box {
-  Editer e;
+  MEditer e;
   
   GButton[] bs;
   String[] ct = {"import", "layer1", "layer2", "layer3", "mask", "save", "fill", "pen", "eraser", ""};
   
-  Gui(Editer e) {
+  Gui(MEditer e) {
     this.e = e;
     
     p = new IVector(0, 0);
@@ -133,5 +133,3 @@ class GButton extends Box { // Gui_Button
   }
   
 }
-
-

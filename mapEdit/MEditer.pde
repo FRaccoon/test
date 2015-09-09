@@ -1,5 +1,5 @@
 
-class Editer {
+class MEditer {
   int c; // chip_size
   boolean d; //debug
   
@@ -10,9 +10,9 @@ class Editer {
   
   PImage bt_img;
   
-  Editer() {
+  MEditer() {
     c = 16;
-    d = false;
+    d = true;
     
     bt_img = loadImage("btn_img.png");
     
@@ -20,8 +20,6 @@ class Editer {
     sb = new SideBar(this);
     ml = new MapLayer(this);
     i = new Input(this);
-    
-    //PFont font = loadFont("HGPMinchoB-20.vlw");
     
   }
   
@@ -64,4 +62,3 @@ class Editer {
   }
   
 }
-

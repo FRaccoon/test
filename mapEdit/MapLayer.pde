@@ -1,6 +1,6 @@
 
 class MapLayer extends Box {
-  Editer e;
+  MEditer e;
   
   Layers ls;
   //LButton[] lb;
@@ -12,7 +12,7 @@ class MapLayer extends Box {
   IVector cs; // chip_size
   boolean mt; // mask_tool true: pen(black), false: eraser(white)
   
-  MapLayer(Editer e) {
+  MapLayer(MEditer e) {
     this.e = e;
     
     p = new IVector(0, 55);
@@ -202,12 +202,12 @@ class Layers extends Box {
 }
 
 class Layer {
-  Editer e;
+  MEditer e;
   PImage l;
   IVector s;
   IVector[][] c;
   
-  Layer(Editer e, IVector s) {
+  Layer(MEditer e, IVector s) {
     this.e = e;
     set_size(s);
   }
@@ -215,10 +215,10 @@ class Layer {
   void set_size(IVector ss) {
     l = createImage(ss.x*e.c, ss.y*e.c, ARGB);
     this.s = ss;
-    this.m = new IVector[s.x][s.y];
-    for(int i=0;s.x;i++) {
+    this.c = new IVector[s.x][s.y];
+    for(int i=0;i<s.x;i++) {
       for(int j=0;j<s.y;j++) {
-        mi[i][j] = new IVector(-1, -1);
+        c[i][j] = new IVector(0, -1);
       }
     }
   }
@@ -341,5 +341,3 @@ class LButton extends Box { // MapLayer_Button
   }
   
 }
-
-
