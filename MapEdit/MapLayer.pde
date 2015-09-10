@@ -37,8 +37,7 @@ class MapLayer extends Box {
   void del_layer(LButton b) {
     if (nl()<1 && !e.alert("delete ' "+b.get_ct()+" ' ?"))return ;
     
-    if(ls.now < b.get_n())ls.now--;
-    bp = new IVector(6, 0);
+    if(ls.now > b.get_n())ls.now--;
     for(int i=b.get_n()+1;i<nl();i++) {
       lb.get(i).p.x -= b.s.x;
     }

@@ -100,9 +100,9 @@ class GButton extends Box { // Gui_Button
   boolean selected() {
     boolean r = false;
     switch(t) {
-      case 3:r=g.e.ml.ls.tt;break; // pen
-      case 4:r=!g.e.ml.ls.tt;break; // eraser
-      case 5:r=!g.e.ml.ls.et;break; // mask
+      case 4:r=g.e.ml.ls.tt;break; // pen
+      case 5:r=!g.e.ml.ls.tt;break; // eraser
+      case 6:r=!g.e.ml.ls.et;break; // mask
       default:/*r=inside(mouseX, mouseY);*/break; // other
     }
     return r;
@@ -115,11 +115,11 @@ class GButton extends Box { // Gui_Button
     switch(t) {
       case 0:g.e.ml.ls.imp();break; // import
       case 1:g.e.ml.ls.save();break; // save
-      case 2:g.e.ml.add_layer();break; //add
+      case 2:g.e.ml.add_layer();break; //add_l
       case 3:g.e.ml.ls.fill_layer();break; // fill
       case 4:g.e.ml.ls.tt=true;break; // pen
       case 5:g.e.ml.ls.tt=false;break; // eraser
-      case 6:g.e.ml.ls.et=false;break; // mask
+      case 6:g.e.ml.ls.et=!g.e.ml.ls.et;break; // mask
       default:break;
     }
     
