@@ -1,27 +1,34 @@
 
 class MapLayer extends Box {
   MEditer e;
-  IVector bp;
-  int n;
   
   Layers ls;
   ArrayList<LButton> lb;
   
+  IVector bp; //button_pos
+  int n;
+  
   MapLayer(MEditer e) {
     this.e = e;
     
-    p = new IVector(0, 29);
-    s = new IVector(width-160, height-52);
+    p = new IVector(0, 33);
+    s = new IVector(e.s.x-160, e.s.y-33);
     
     n = 0;
     ls = new Layers(this, layer_size()); // set m.x, m.y
     lb = new ArrayList<LButton>();
-    bp = new IVector(6, 0);
+    bp = new IVector(8, 0);
     for(int i=0;i<3;i++) {
       add_layer();
     }
     
   }
+  
+  int px(int px) {return e.px(px)-p.x;}
+  int py(int py) {return e.py(py)-p.y;}
+  
+  int cx(int cx) {return e.cx(cx+p.x);}
+  int cy(int cy) {return e.cy(cy+p.y);}
   
   void add_layer() {
     Layer l = new Layer(ls);
@@ -48,7 +55,6 @@ class MapLayer extends Box {
     lb.remove(b);
     
     //n--;
-    
   }
   
   int nl() { // number_of_layer
@@ -65,7 +71,7 @@ class MapLayer extends Box {
   }
   
   void update() {
-    if(ls.update())return ;
+    if(ls.update()) {}
   }
   
   boolean press_event(int mx, int my) {
@@ -80,11 +86,14 @@ class MapLayer extends Box {
   
   boolean key_release_event(int mx, int my) {
     if(!this.inside(mx, my))return false;
-    if(ls.inside(mx, my))return true;
     
-    for(int i=0;i<nl();i++) {
-      if(lb.get(i).key_release_event(mx, my))break;
+    if(ls.key_release_event(mx, my)) {
+    }else {
+      for(int i=0;i<nl();i++) {
+        if(lb.get(i).key_release_event(mx, my))break;
+      }
     }
+    
     return true;
   }
   
@@ -133,6 +142,7 @@ class Layers extends Box {
   PImage mat;
   
   boolean et, tt; //  eidt_type: true: layer, false: mask; tool_type true: pen(white), false: eraser(black)
+  IVector pm; // p_mouse
   
   EImage bg_img;
   EImage mask;
@@ -143,7 +153,7 @@ class Layers extends Box {
   Layers(MapLayer ml, IVector cs) {
     this.ml = ml;
     
-    p = new IVector(6, 23);
+    p = new IVector(8, 25);
     this.cs = cs;
     s = new IVector(34*ml.e.c, 25*ml.e.c);
     
@@ -151,6 +161,8 @@ class Layers extends Box {
     
     et = true;
     tt = true;
+    
+    pm = new IVector(0, 0);
     
     ls = new ArrayList<Layer>();
     this.now=0;
@@ -163,7 +175,7 @@ class Layers extends Box {
     bg_img.fill_pimg(loadImage("./data/bg_img.png"));
     
     mask = new EImage();
-    mask.set_size(this.cs.get().mult(ml.e.c));
+    mask.set_size(this.cs.mult(ml.e.c));
     mask.fill_color(color(0));
     
     ss = 10;
@@ -171,16 +183,19 @@ class Layers extends Box {
     
   }
   
-  int px(int px) {return ml.px(px) - p.x;}
-  int py(int py) {return ml.py(py) - p.y;}
+  int px(int px) {return ml.px(px)-p.x;}
+  int py(int py) {return ml.py(py)-p.y;}
   
-  int cx(int cx) {return ml.cx(cx + p.x);}
-  int cy(int cy) {return ml.cy(cy + p.y);}
+  int cx(int cx) {return ml.cx(cx+p.x);}
+  int cy(int cy) {return ml.cy(cy+p.y);}
   
-  int mx(int px) {return (px(px-(chip.cs.x-1)*ml.e.c/2+a.x)/ml.e.c);}
-  int my(int py) {return (py(py-(chip.cs.y-1)*ml.e.c/2+a.y)/ml.e.c);}
+  int mx(int px) {return (px(px+a.x)/ml.e.c)-(px(px+a.x)<0?1:0);}
+  int my(int py) {return (py(py+a.y)/ml.e.c)-(py(py+a.y)<0?1:0);}
   
-  IVector mp(int px, int py) {return new IVector(mx(px), my(py));}
+  int sx(int px) {return px-(chip.cs.x-1)*ml.e.c/2;}
+  int sy(int py) {return py-(chip.cs.y-1)*ml.e.c/2;}
+  
+  IVector mp(int px, int py) {return new IVector(mx(sx(px)), my(sy(py)));}
   
   Layer get_layer(int i) {
     if(!(i<0) && i<ml.nl())return ls.get(i);
@@ -218,8 +233,8 @@ class Layers extends Box {
     
     if(inside(mouseX, mouseY)){
       Box mc = new Box(); // mouse_cursor
-      mc.p = new IVector(cx(mx(mouseX)*ml.e.c-a.x), cy(my(mouseY)*ml.e.c-a.y));
-      mc.s = new IVector(chip.cs.x*ml.e.c, chip.cs.y*ml.e.c);
+      mc.p = cp(mp(mouseX, mouseY).mult(ml.e.c).sub(a));
+      mc.s = chip.cs.mult(ml.e.c);
       
       if(et && tt) {
         tint(255, 156);
@@ -229,7 +244,7 @@ class Layers extends Box {
       
       stroke(tt?255:0);
       fill(0, 204, 255, 100);
-      rect(mc.p.x, mc.p.y, mc.s.x, mc.s.y);
+      mc.box();
       
       if(ml.e.d) {
         textAlign(RIGHT, TOP);textSize(12);fill(255);
@@ -253,16 +268,99 @@ class Layers extends Box {
     if(a.x>cs.x*ml.e.c+ms.x-s.x)a.x=cs.x*ml.e.c+ms.x-s.x;
     if(a.y>cs.y*ml.e.c+ms.y-s.y)a.y=cs.y*ml.e.c+ms.y-s.y;
     
-    if(ml.e.i.md && !ml.e.sb.pr) { // edit
+    IVector mp = mp(mouseX, mouseY);
+    if(ml.e.i.md && !ml.e.sb.pr && !pm.equals(mp)) { // edit
       if(et) {
-        if(tt)get_layer(now).paint(chip, mp(mouseX, mouseY));
-        else get_layer(now).erase(mp(mouseX, mouseY), chip.cs);
+        if(tt)get_layer(now).paint(chip, mp);
+        else get_layer(now).erase(mp, chip.cs);
       }else {
-        mask.paint_color(tt?color(255):color(0), mp(mouseX, mouseY).mult(ml.e.c), chip.cs.get().mult(ml.e.c));
+        mask.paint_color(tt?color(255):color(0), mp.mult(ml.e.c), chip.cs.mult(ml.e.c));
       }
+      pm.set(mp);
     }
     
     return true;
+  }
+  
+  boolean key_release_event(int mx, int my) {
+    if(!this.inside(mx, my))return false;
+    if(key=='f')auto_fill(new IVector(mx(mx), my(my)));
+    return true;
+  }
+  
+  void auto_fill(IVector sp) {
+    int[] dx = { 1, 0,-1, 0}, dy = { 0, 1, 0,-1};
+    boolean[][] t = new boolean[cs.x][cs.y];
+    for(int i=0;i<cs.x;i++){for(int j=0;j<cs.y;j++){
+      t[i][j] = false;
+    }}
+    ArrayList<IVector> que = new ArrayList<IVector>();
+    que.add(sp.get());
+    
+    if(et) {
+      Layer l = get_layer(now);
+      IVector ip = sp.get(), xp = sp.get();
+      int v = l.t[sp.x][sp.y];
+      while(que.size()>0) {
+        IVector q = que.get(0);
+        if(!t[q.x][q.y] && l.t[q.x][q.y]==v) {
+          t[q.x][q.y] = true;
+          if(q.x<ip.x)ip.x=q.x;
+          else if(q.x>xp.x)xp.x=q.x;
+          if(q.y<ip.y)ip.y=q.y;
+          else if(q.y>xp.y)xp.y=q.y;
+          for(int i=0;i<dx.length;i++) {
+            IVector dn = q.get().add(dx[i], dy[i]);
+            if(dn.x<0 || dn.y<0 || dn.x>=cs.x || dn.y>=cs.y)continue;
+            que.add(dn);
+          }
+        }
+        que.remove(q);
+      }
+      
+      for(int i=ip.x;i<=xp.x;i++) {for(int j=ip.y;j<=xp.y;j++) {
+        if(t[i][j]) {
+          IVector cp = new IVector(i, j);
+          if(tt) {
+            cp.sub(ip);
+            cp.mod(chip.cs);
+            l.t[i][j] = chip.t[cp.x][cp.y];
+            cp.scalar(ml.e.c);
+            l.paint_pimg(chip.l.get(cp.x, cp.y, ml.e.c, ml.e.c), (new IVector(i, j)).scalar(ml.e.c));
+          }else {
+            l.t[i][j] = -1;
+            l.paint_color(color(0, 0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
+          }
+        }
+      }}
+      
+    }else {
+      IVector ip = sp.get(), xp = sp.get();
+      color v = mask.get(sp.mult(ml.e.c));
+      while(que.size()>0) {
+        IVector q = que.get(0);
+        if(!t[q.x][q.y] && mask.get(q.mult(ml.e.c))==v) {
+          t[q.x][q.y] = true;
+          if(q.x<ip.x)ip.x=q.x;
+          else if(q.x>xp.x)xp.x=q.x;
+          if(q.y<ip.y)ip.y=q.y;
+          else if(q.y>xp.y)xp.y=q.y;
+          for(int i=0;i<dx.length;i++) {
+            IVector dn = q.get().add(dx[i], dy[i]);
+            if(dn.x<0 || dn.y<0 || dn.x>=cs.x || dn.y>=cs.y)continue;
+            que.add(dn);
+          }
+        }
+        que.remove(q);
+      }
+      
+      for(int i=ip.x;i<=xp.x;i++) {for(int j=ip.y;j<=xp.y;j++) {
+          IVector cp = new IVector(i, j);
+          if(t[i][j])mask.paint_color(tt?color(255):color(0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
+      }}
+      
+    }
+    
   }
   
   void imp() { // import
@@ -306,7 +404,7 @@ class Layer extends EImage {
     this.ls = ls;
     this.cs = ls.cs;
     reset();
-    disp=true;
+    disp = true;
   }
   
   Layer(Layers ls, IVector cs) {
@@ -332,7 +430,7 @@ class Layer extends EImage {
         this.t[s.x+i][s.y+j] = mat.t[i][j];
       }
     }
-    paint_pimg(mat.l, s.get().mult(ls.ml.e.c));
+    paint_pimg(mat.l, s.mult(ls.ml.e.c));
   }
   
   void erase(IVector s, IVector sz) {
@@ -341,7 +439,7 @@ class Layer extends EImage {
         this.t[s.x+i][s.y+j] = -1;
       }
     }
-    paint_color(color(0, 0), s.get().mult(ls.ml.e.c), sz.get().mult(ls.ml.e.c));
+    paint_color(color(0, 0), s.mult(ls.ml.e.c), sz.mult(ls.ml.e.c));
   }
   
   void paint_all(Layer mat) {
@@ -375,6 +473,10 @@ class EImage {
   
   void set_img(PImage l) {
     this.l = l;
+  }
+  
+  color get(IVector p) {
+    return l.get(p.x, p.y);
   }
   
   void draw(Box b) {
@@ -458,11 +560,11 @@ class LButton extends Box { // MapLayer_Button
     
   }
   
-  int px(int px) {return ml.px(px) - p.x;}
-  int py(int py) {return ml.py(py) - p.y;}
+  int px(int px) {return ml.px(px)-p.x;}
+  int py(int py) {return ml.py(py)-p.y;}
   
-  int cx(int cx) {return ml.cx(cx + p.x);}
-  int cy(int cy) {return ml.cy(cy + p.y);}
+  int cx(int cx) {return ml.cx(cx+p.x);}
+  int cy(int cy) {return ml.cy(cy+p.y);}
   
   void draw() {
     if(this.selected()) {
@@ -477,7 +579,7 @@ class LButton extends Box { // MapLayer_Button
     textAlign(CENTER, CENTER);
     textSize(cs);
     fill(0);
-    text(get_ct(), cx(0)+s.x*.5, cy(0)+s.y*.5);
+    text(get_ct(), cx(s.x/2), cy(s.y/2));
     
     if(ml.e.d)area();
   }

@@ -2,7 +2,8 @@
 class SideBar extends Box {
   MEditer e;
   
-  int a, ss, ms; // (*, a) = top; scroll_speed; margin_size
+  int ss; // scroll_speed;
+  IVector a, ms; // (a.x, a.y) = (0, 0); ms: margin_size
   
   IVector mp; // mouse_position
   boolean pr; // mouse_press
@@ -13,12 +14,14 @@ class SideBar extends Box {
   SideBar(MEditer e) {
     this.e = e;
     
-    p = new IVector(width-e.c*10, 0);
-    s = new IVector(e.c*10, height);
+    p = new IVector(e.s.x-e.c*10, 0); // e.c*10);
+    s = new IVector(e.c*10, e.s.y); // -e.c*10);
     
     mp = new IVector(0, 0);
     
-    a = 0;
+    ss = 18;
+    a = new IVector(-e.c, 0);
+    ms = new IVector(2*s.x/3, 2*s.y/3);
     
     pr = false;
     
@@ -26,37 +29,42 @@ class SideBar extends Box {
     ec.set_img(loadImage("base_img.png"));
     w = ec.l.width/e.c;
     
-    ss = 18;
-    ms = 2*s.y/3;
-    
   }
   
   void update() {
     if(inside(mouseX, mouseY)) {
-      if((e.i.kw || e.i.kup))a-=ss;
-      if((e.i.ks || e.i.kdown))a+=ss;
+      if((e.i.kw || e.i.kup))a.y-=ss;
+      if((e.i.ks || e.i.kdown))a.y+=ss;
       
-      if(a<-ms)a=-ms;
-      if(a>ec.l.height+ms-s.y)a=ec.l.height+ms-s.y;
+      //if(a.y<-ms.x)a.x=-ms.x;
+      if(a.y<-ms.y)a.y=-ms.y;
+      //if(a.x>ec.l.width+ms.x-s.x)a.x=ec.l.width+ms.x-s.x;
+      if(a.y>ec.l.height+ms.y-s.y)a.y=ec.l.height+ms.y-s.y;
       
     }
     
   }
   
-  int mx(int px) {return (px(px)/e.c);}
-  int my(int py) {return ((py(py)+a)/e.c);}
+  int px(int px) {return e.px(px)-p.x;}
+  int py(int py) {return e.py(py)-p.y;}
+  
+  int cx(int cx) {return e.cx(cx+p.x);}
+  int cy(int cy) {return e.cy(cy+p.y);}
+  
+  int mx(int px) {return (px(px+a.x)/e.c)-(px(px+a.x)<0?1:0);}
+  int my(int py) {return (py(py+a.y)/e.c)-(py(py+a.y)<0?1:0);}
   
   void draw() {
-    ec.draw((Box)this, new IVector(0, a));
+    ec.draw((Box)this, a);
     
     stroke(255);
     fill(0, 204, 255, 100);
     if(pr) {
       IVector xp = new IVector(max(mp.x, mx(mouseX)), max(mp.y, my(mouseY))),
       ip = new IVector(min(mp.x, mx(mouseX)), min(mp.y, my(mouseY)));
-      rect(cx(ip.x*e.c), cy(ip.y*e.c-a), (xp.x-ip.x+1)*e.c, (xp.y-ip.y+1)*e.c-a);
+      cp(ip.mult(e.c)).sub(a).box(xp.sub(ip).add(1, 1).mult(e.c));
     }else {
-      rect(cx(mp.x*e.c), cy(mp.y*e.c-a), e.ml.ls.chip.cs.x*e.c, e.ml.ls.chip.cs.y*e.c);
+      cp(mp.mult(e.c)).sub(a).box(e.ml.ls.chip.cs.mult(e.c));
     }
     
     if(e.d)area();
@@ -85,11 +93,16 @@ class SideBar extends Box {
     return true;
   }
   
-  void wheel_event(int delta) {
-    a += delta*ss/5;
+  boolean wheel_event(int delta) {
+    if(!inside(mouseX, mouseY))return false;
+    a.y += delta*ss;
     
-    if(a<-2*s.y/3)a=-2*s.y/3;
-    if(a>ec.l.height-s.y/3)a=ec.l.height-s.y/3;
+    //if(a.y<-ms.x)a.x=-ms.x;
+    if(a.y<-ms.y)a.y=-ms.y;
+    //if(a.x>ec.l.width+ms.x-s.x)a.x=ec.l.width+ms.x-s.x;
+    if(a.y>ec.l.height+ms.y-s.y)a.y=ec.l.height+ms.y-s.y;
+    
+    return true;
     
   }
   

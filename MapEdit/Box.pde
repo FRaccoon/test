@@ -8,16 +8,26 @@ class Box {
     return px(px)>0 && px(px)<s.x && py(py)>0 && py(py)<s.y;
   }
   
-  int px(int px) { return px - p.x; }
-  int py(int py) { return py - p.y; }
+  int px(int px) {return px-p.x;}
+  int py(int py) {return py-p.y;}
   
-  int cx(int cx) { return cx + p.x; }
-  int cy(int cy) { return cy + p.y; }
+  int cx(int cx) {return cx+p.x;}
+  int cy(int cy) {return cy+p.y;}
+  
+  IVector pp(int px,int py) {return new IVector(px(px), py(py));}
+  IVector cp(int cx,int cy) {return new IVector(cx(cx), cy(cy));}
+  
+  IVector pp(IVector p) {return this.pp(p.x, p.y);}
+  IVector cp(IVector c) {return this.cp(c.x, c.y);}
   
   void area() {
     noFill();
     stroke(255);
-    rect(cx(0), cy(0), s.x, s.y);
+    this.box();
+  }
+  
+  void box() {
+    cp(0, 0).box(s);
   }
   
 }
@@ -40,15 +50,27 @@ class IVector { // int_vector
     return this;
   }
   
-  IVector add(int x, int y) {
-    this.x += x;
-    this.y += y;
+  IVector add(int ax, int ay) {
+    this.x += ax;
+    this.y += ay;
     return this;
   }
   
-  IVector sub(int x, int y) {
-    this.x -= x;
-    this.y -= y;
+  IVector sub(int sx, int sy) {
+    this.x -= sx;
+    this.y -= sy;
+    return this;
+  }
+  
+  IVector mod(int mx, int my) {
+    if(x>0)this.x %= mx;
+    if(y>0)this.y %= my;
+    return this;
+  }
+  
+  IVector scalar(int v) {
+    this.x *= v;
+    this.y *= v;
     return this;
   }
   
@@ -57,16 +79,20 @@ class IVector { // int_vector
   }
   
   IVector set(IVector v) {return this.set(v.x, v.y);}
-  IVector add(IVector v) {return this.add(v.x, v.y);}
-  IVector sub(IVector v) {return this.sub(v.x, v.y);}
+  IVector add(IVector a) {return this.add(a.x, a.y);}
+  IVector sub(IVector s) {return this.sub(s.x, s.y);}
+  IVector mod(IVector m) {return this.mod(m.x, m.y);}
   boolean equals(IVector v) {return this.equals(v.x, v.y);}
   
   IVector mult(int v) {
-    this.x *= v;
-    this.y *= v;
-    return this;
+    return new IVector(this.x*v, this.y*v);
   }
   
   void print() {println("x: "+x+", y: "+y);} // debug
+  void point() {ellipse(x, y, 2, 2);} // debug
+  
+  void box(IVector s) {
+    rect(this.x, this.y, s.x, s.y);
+  }
   
 }

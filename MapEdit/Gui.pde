@@ -9,15 +9,21 @@ class Gui extends Box {
     this.e = e;
     
     p = new IVector(0, 0);
-    s = new IVector(width-160, 29);
+    s = new IVector(e.s.x-160, 33);
     
     bs = new GButton[ct.length];
     
-    bs[0] = new GButton(this, 0, 6, 6);
+    bs[0] = new GButton(this, 0, 8, 8);
     for(int i=1;i<bs.length;i++) {
-      bs[i] = new GButton(this, i, bs[i-1].p.x+bs[i-1].s.x, 6);
+      bs[i] = new GButton(this, i, bs[i-1].p.x+bs[i-1].s.x, bs[i-1].p.y);
     }
   }
+  
+  int px(int px) {return e.px(px)-p.x;}
+  int py(int py) {return e.py(py)-p.y;}
+  
+  int cx(int cx) {return e.cx(cx+p.x);}
+  int cy(int cy) {return e.cy(cy+p.y);}
   
   void update() {
   }
@@ -64,11 +70,11 @@ class GButton extends Box { // Gui_Button
     
   }
   
-  int px(int px) {return g.px(px) - p.x;}
-  int py(int py) {return g.py(py) - p.y;}
+  int px(int px) {return g.px(px)-p.x;}
+  int py(int py) {return g.py(py)-p.y;}
   
-  int cx(int cx) {return g.cx(cx + p.x);}
-  int cy(int cy) {return g.cy(cy + p.y);}
+  int cx(int cx) {return g.cx(cx+p.x);}
+  int cy(int cy) {return g.cy(cy+p.y);}
   
   void draw() {
     if(pr) {

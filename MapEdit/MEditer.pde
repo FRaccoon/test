@@ -1,5 +1,5 @@
 
-class MEditer {
+class MEditer extends Box {
   int c; // chip_size
   boolean d; //debug
   
@@ -12,7 +12,10 @@ class MEditer {
   
   MEditer() {
     c = 16;
-    d = false;
+    d = true;
+    
+    p = new IVector(0, 0);
+    s = new IVector(width, height); // 720, 500
     
     bt_img = loadImage("btn_img.png");
     
@@ -27,12 +30,15 @@ class MEditer {
     ml.update();
     sb.update();
     g.update();
+    
   }
   
   void draw() {
     ml.draw();
     sb.draw();
     g.draw();
+    
+    if(this.d)area();
   }
   
   void mousePressed(){
@@ -43,6 +49,7 @@ class MEditer {
       
     }
     i.mousePressed();
+    
   }
   
   void mouseReleased(){
@@ -50,20 +57,24 @@ class MEditer {
       if(sb.release_event(mouseX, mouseY)) {}
     }
     i.mouseReleased();
+    
   }
   
   void mouseWheel(int delta){
-    if(sb.inside(mouseX, mouseY))sb.wheel_event(delta);
+    if(sb.wheel_event(delta)) {}
     //i.mouseWheel(delta);
+    
   }
   
   void keyPressed(){
     i.keyPressed();
+    
   }
   
   void keyReleased(){
     if(ml.key_release_event(mouseX, mouseY)) {}
     i.keyReleased();
+    
   }
   
   boolean alert(String str) { //このクラスはjavaで作られてます
