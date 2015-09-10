@@ -67,18 +67,22 @@ class Input {
   }
   
   void mousePressed() {
-    if(!md)e.sb.press_event(mouseX, mouseY);
-    
-    md = true;
+    if(!md) {
+      md = true;
+      
+    if(e.sb.press_event(mouseX, mouseY))return;
+    if(e.g.press_event(mouseX, mouseY))return;
+    if(e.ml.press_event(mouseX, mouseY))return;
+    }
     
   }
   
   void mouseReleased() {
-    md = false;
-    
-    if(e.sb.release_event(mouseX, mouseY))return;
-    if(e.g.press_event(mouseX, mouseY))return;
-    
+    if(md) {
+      md = false;
+      
+      if(e.sb.release_event(mouseX, mouseY))return;
+    }
   }
   
   void mouseWheel(int delta) {

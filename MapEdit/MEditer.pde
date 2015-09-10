@@ -12,7 +12,7 @@ class MEditer {
   
   MEditer() {
     c = 16;
-    d = true;
+    d = false;
     
     bt_img = loadImage("btn_img.png");
     

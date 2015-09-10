@@ -3,21 +3,20 @@ class Gui extends Box {
   MEditer e;
   
   GButton[] bs;
-  String[] ct = {"import", "layer1", "layer2", "layer3", "mask", "save", "fill", "pen", "eraser", ""};
+  String[] ct = {"import", "save", "add_l", "fill", "pen", "eraser", "mask"};
   
   Gui(MEditer e) {
     this.e = e;
     
     p = new IVector(0, 0);
-    s = new IVector(width-160, 52);
+    s = new IVector(width-160, 29);
     
-    bs = new GButton[ct.length-1];
+    bs = new GButton[ct.length];
     
-    bs[0] = new GButton(this, ct.length-1, 6, 6);
+    bs[0] = new GButton(this, 0, 6, 6);
     for(int i=1;i<bs.length;i++) {
-      bs[i] = new GButton(this, i, bs[i-1].p.x+bs[i-1].s.x, 29);
+      bs[i] = new GButton(this, i, bs[i-1].p.x+bs[i-1].s.x, 6);
     }
-    bs[0].set_t(0);
   }
   
   void update() {
@@ -50,7 +49,7 @@ class Gui extends Box {
 class GButton extends Box { // Gui_Button
   Gui g;
   int t; // type
-  int cs;
+  int cs; // content_size
   boolean pr; // pressed
   
   GButton(Gui g, int t, int px, int py) {
@@ -101,12 +100,10 @@ class GButton extends Box { // Gui_Button
   boolean selected() {
     boolean r = false;
     switch(t) {
-      case 1:case 2:case 3: // layer1~3
-      r=(g.e.ml.ls.et && g.e.ml.ls.now==t-1);break; // g.e.ml.get_layer(t).disp
-      case 4:r=!g.e.ml.ls.et;break; // mask
-      case 7:r=g.e.ml.ls.tt;break; // pen
-      case 8:r=!g.e.ml.ls.tt;break; // eraser
-      default:/*r=inside(mouseX, mouseY);*/break; // import, save, fill
+      case 3:r=g.e.ml.ls.tt;break; // pen
+      case 4:r=!g.e.ml.ls.tt;break; // eraser
+      case 5:r=!g.e.ml.ls.et;break; // mask
+      default:/*r=inside(mouseX, mouseY);*/break; // other
     }
     return r;
   }
@@ -117,13 +114,12 @@ class GButton extends Box { // Gui_Button
     
     switch(t) {
       case 0:g.e.ml.ls.imp();break; // import
-      case 1:case 2:case 3: // layer1~3
-      g.e.ml.ls.et=true;g.e.ml.ls.now=t-1;break;
-      case 4:g.e.ml.ls.et=false;break; // mask
-      case 5:g.e.ml.ls.save();break; // save
-      case 6:g.e.ml.ls.fill_layer();break; // fill
-      case 7:g.e.ml.ls.tt=true;break; // pen
-      case 8:g.e.ml.ls.tt=false;break; // eraser
+      case 1:g.e.ml.ls.save();break; // save
+      case 2:g.e.ml.add_layer();break; //add
+      case 3:g.e.ml.ls.fill_layer();break; // fill
+      case 4:g.e.ml.ls.tt=true;break; // pen
+      case 5:g.e.ml.ls.tt=false;break; // eraser
+      case 6:g.e.ml.ls.et=false;break; // mask
       default:break;
     }
     

@@ -2,7 +2,7 @@
 class SideBar extends Box {
   MEditer e;
   
-  int a, ss; // (*, a) = top; scroll_speed
+  int a, ss, ms; // (*, a) = top; scroll_speed; margin_size
   
   IVector mp; // mouse_position
   boolean pr; // mouse_press
@@ -26,7 +26,8 @@ class SideBar extends Box {
     ec.set_img(loadImage("base_img.png"));
     w = ec.l.width/e.c;
     
-    ss=10;
+    ss = 18;
+    ms = 2*s.y/3;
     
   }
   
@@ -35,8 +36,9 @@ class SideBar extends Box {
       if((e.i.kw || e.i.kup))a-=ss;
       if((e.i.ks || e.i.kdown))a+=ss;
       
-      if(a<0)a=0;
-      if(a+s.y>ec.l.height)a=ec.l.height;
+      if(a<-ms)a=-ms;
+      if(a>ec.l.height+ms-s.y)a=ec.l.height+ms-s.y;
+      
     }
     
   }
@@ -84,8 +86,10 @@ class SideBar extends Box {
   }
   
   void wheel_event(int delta) {
-    a += delta;
-    if(a<0 || a>ec.l.height)a = 0;
+    a += delta*ss/5;
+    
+    if(a<-2*s.y/3)a=-2*s.y/3;
+    if(a>ec.l.height-s.y/3)a=ec.l.height-s.y/3;
     
   }
   
