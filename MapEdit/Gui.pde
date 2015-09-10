@@ -101,12 +101,11 @@ class GButton extends Box { // Gui_Button
   boolean selected() {
     boolean r = false;
     switch(t) {
-      case 1:r=(g.e.ml.now==1);break; // layer1
-      case 2:r=(g.e.ml.now==2);break; // layer2
-      case 3:r=(g.e.ml.now==3);break; // layer3
-      case 4:r=(g.e.ml.now==0);break; // mask
-      case 7:r=g.e.ml.mt;break; // pen
-      case 8:r=!g.e.ml.mt;break; // eraser
+      case 1:case 2:case 3: // layer1~3
+      r=(g.e.ml.ls.et && g.e.ml.ls.now==t-1);break; // g.e.ml.get_layer(t).disp
+      case 4:r=!g.e.ml.ls.et;break; // mask
+      case 7:r=g.e.ml.ls.tt;break; // pen
+      case 8:r=!g.e.ml.ls.tt;break; // eraser
       default:/*r=inside(mouseX, mouseY);*/break; // import, save, fill
     }
     return r;
@@ -118,14 +117,13 @@ class GButton extends Box { // Gui_Button
     
     switch(t) {
       case 0:g.e.ml.ls.imp();break; // import
-      case 1:g.e.ml.now=1;break; // layer1
-      case 2:g.e.ml.now=2;break; // layer2
-      case 3:g.e.ml.now=3;break; // layer3
-      case 4:g.e.ml.now=0;break; // mask
+      case 1:case 2:case 3: // layer1~3
+      g.e.ml.ls.et=true;g.e.ml.ls.now=t-1;break;
+      case 4:g.e.ml.ls.et=false;break; // mask
       case 5:g.e.ml.ls.save();break; // save
-      case 6:g.e.ml.ls.fill_layer(g.e.ml.now);break; // fill
-      case 7:g.e.ml.mt=true;break; // pen
-      case 8:g.e.ml.mt=false;break; // eraser
+      case 6:g.e.ml.ls.fill_layer();break; // fill
+      case 7:g.e.ml.ls.tt=true;break; // pen
+      case 8:g.e.ml.ls.tt=false;break; // eraser
       default:break;
     }
     

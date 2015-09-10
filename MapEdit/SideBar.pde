@@ -2,12 +2,13 @@
 class SideBar extends Box {
   MEditer e;
   
-  int a; // (*, a) = top
+  int a, ss; // (*, a) = top; scroll_speed
   
   IVector mp; // mouse_position
   boolean pr; // mouse_press
   
-  PImage ec;
+  EImage ec;
+  int w; // chip_width
   
   SideBar(MEditer e) {
     this.e = e;
@@ -21,33 +22,39 @@ class SideBar extends Box {
     
     pr = false;
     
-    ec = loadImage("base_img.png");
+    ec = new EImage();
+    ec.set_img(loadImage("base_img.png"));
+    w = ec.l.width/e.c;
+    
+    ss=10;
     
   }
   
   void update() {
     if(inside(mouseX, mouseY)) {
-      if((e.i.kw || e.i.kup) && a>0)a--;
-      if((e.i.ks || e.i.kdown) && a*e.c+s.y<ec.height)a++;
+      if((e.i.kw || e.i.kup))a-=ss;
+      if((e.i.ks || e.i.kdown))a+=ss;
       
+      if(a<0)a=0;
+      if(a+s.y>ec.l.height)a=ec.l.height;
     }
     
   }
   
   int mx(int px) {return (px(px)/e.c);}
-  int my(int py) {return (py(py)/e.c)+a;}
+  int my(int py) {return ((py(py)+a)/e.c);}
   
   void draw() {
-    image(ec.get(0, a*e.c, s.x, s.y), cx(0), cy(0));
+    ec.draw((Box)this, new IVector(0, a));
     
     stroke(255);
     fill(0, 204, 255, 100);
     if(pr) {
       IVector xp = new IVector(max(mp.x, mx(mouseX)), max(mp.y, my(mouseY))),
       ip = new IVector(min(mp.x, mx(mouseX)), min(mp.y, my(mouseY)));
-      rect(cx(0)+ip.x*e.c, cy(0)+(ip.y-a)*e.c, (xp.x-ip.x+1)*e.c, (xp.y-ip.y-a+1)*e.c);
+      rect(cx(ip.x*e.c), cy(ip.y*e.c-a), (xp.x-ip.x+1)*e.c, (xp.y-ip.y+1)*e.c-a);
     }else {
-      rect(cx(0)+mp.x*e.c, cy(0)+(mp.y-a)*e.c, e.ml.cs.x*e.c, e.ml.cs.y*e.c);
+      rect(cx(mp.x*e.c), cy(mp.y*e.c-a), e.ml.ls.chip.cs.x*e.c, e.ml.ls.chip.cs.y*e.c);
     }
     
     if(e.d)area();
@@ -59,13 +66,10 @@ class SideBar extends Box {
     pr = true;
     
     mp.set(mx(mouseX), my(mouseY));
-    e.ml.cs.set(1, 1);
-    
-    e.ml.set_chip(ec, mp);
+    e.ml.ls.set_chip(mp, new IVector(1, 1));
     
     return true;
   }
-  
   
   boolean release_event(int mx, int my) {
     pr = false;
@@ -73,16 +77,15 @@ class SideBar extends Box {
     
     IVector np = new IVector(max(mp.x, mx(mouseX)), max(mp.y, my(mouseY)));
     mp.set(min(mp.x, mx(mouseX)), min(mp.y, my(mouseY)));
-    e.ml.cs.set(np.x-mp.x+1, np.y-mp.y+1);
     
-    e.ml.set_chip(ec, mp);
+    e.ml.ls.set_chip(mp, new IVector(np.x-mp.x+1, np.y-mp.y+1));
     
     return true;
   }
   
   void wheel_event(int delta) {
     a += delta;
-    if(a<0 || a*e.c>ec.height)a = 0;
+    if(a<0 || a>ec.l.height)a = 0;
     
   }
   
