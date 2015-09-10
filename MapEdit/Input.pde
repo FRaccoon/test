@@ -3,7 +3,7 @@ class Input {
   MEditer e;
   
   boolean kw, ka, ks, kd;
-  boolean kup, kdown, kleft, kright, kshift;
+  boolean kup, kdown, kleft, kright, kshift, kbs;
   boolean md;
   
   Input(MEditer e) {
@@ -19,6 +19,7 @@ class Input {
     kleft = false;
     kright = false;
     kshift = false;
+    kbs = false;
     
     md = false;
     
@@ -32,6 +33,7 @@ class Input {
        case LEFT:kleft=true;break;
        case RIGHT:kright=true;break;
        case SHIFT:kshift=true;break;
+       case BACKSPACE:kbs=true;break;
        default:break;
       }
     }else {
@@ -43,6 +45,7 @@ class Input {
        default:break;
       }
     }
+    
   }
   
   void keyReleased() {
@@ -53,6 +56,7 @@ class Input {
        case LEFT:kleft=false;break;
        case RIGHT:kright=false;break;
        case SHIFT:kshift=false;break;
+       case BACKSPACE:kbs=false;break;
        default:break;
       }
     }else {
@@ -64,30 +68,19 @@ class Input {
        default:break;
       }
     }
+    
   }
   
   void mousePressed() {
-    if(!md) {
-      md = true;
-      
-    if(e.sb.press_event(mouseX, mouseY))return;
-    if(e.g.press_event(mouseX, mouseY))return;
-    if(e.ml.press_event(mouseX, mouseY))return;
-    }
+    if(!md)md = true;
     
   }
   
   void mouseReleased() {
-    if(md) {
-      md = false;
-      
-      if(e.sb.release_event(mouseX, mouseY))return;
-    }
-  }
-  
-  void mouseWheel(int delta) {
-    if(e.sb.inside(mouseX, mouseY))e.sb.wheel_event(delta);
+    if(md)md = false;
     
   }
+  
+  //void mouseWheel(int delta) {}
   
 }

@@ -36,15 +36,25 @@ class MEditer {
   }
   
   void mousePressed(){
+    if(!i.md) {
+      if(sb.press_event(mouseX, mouseY)) {
+      }else if(g.press_event(mouseX, mouseY)) {
+      }else if(ml.press_event(mouseX, mouseY)) {}
+      
+    }
     i.mousePressed();
   }
   
   void mouseReleased(){
+    if(i.md) {
+      if(sb.release_event(mouseX, mouseY)) {}
+    }
     i.mouseReleased();
   }
   
   void mouseWheel(int delta){
-    i.mouseWheel(delta);
+    if(sb.inside(mouseX, mouseY))sb.wheel_event(delta);
+    //i.mouseWheel(delta);
   }
   
   void keyPressed(){
@@ -52,6 +62,7 @@ class MEditer {
   }
   
   void keyReleased(){
+    if(ml.key_release_event(mouseX, mouseY)) {}
     i.keyReleased();
   }
   

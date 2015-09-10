@@ -25,7 +25,7 @@ class MapLayer extends Box {
   
   void add_layer() {
     Layer l = new Layer(ls);
-    LButton b = new LButton(this, l, bp);
+    LButton b = new LButton(this, l, n, bp);
     
     ls.ls.add(l);
     lb.add(b);
@@ -34,20 +34,30 @@ class MapLayer extends Box {
     n++;
   }
   
-  void remove_layer(int i) {
-    if(i<0 || !(i<n))return ;
-    LButton b = lb.get(i);
-    Layer l = b.l;
+  void del_layer(LButton b) {
+    if (nl()<1 && !e.alert("delete ' "+b.get_ct()+" ' ?"))return ;
     
+    if(ls.now < b.get_n())ls.now--;
+    bp = new IVector(6, 0);
+    for(int i=b.get_n()+1;i<nl();i++) {
+      lb.get(i).p.x -= b.s.x;
+    }
+    bp.x -= b.s.x;
+    
+    Layer l = b.l;
     ls.ls.remove(l);
     lb.remove(b);
     
-    n--;
+    //n--;
     
   }
   
+  int nl() { // number_of_layer
+    return lb.size();
+  }
+  
   void draw() {
-    for(int i=0;i<n;i++) {
+    for(int i=0;i<nl();i++) {
       lb.get(i).draw();
     }
     ls.draw();
@@ -63,8 +73,18 @@ class MapLayer extends Box {
     if(!this.inside(mx, my))return false;
     if(ls.inside(mx, my))return true;
     
-    for(int i=0;i<n;i++) {
+    for(int i=0;i<nl();i++) {
       if(lb.get(i).press_event(mx, my))break;
+    }
+    return true;
+  }
+  
+  boolean key_release_event(int mx, int my) {
+    if(!this.inside(mx, my))return false;
+    if(ls.inside(mx, my))return true;
+    
+    for(int i=0;i<nl();i++) {
+      if(lb.get(i).key_release_event(mx, my))break;
     }
     return true;
   }
@@ -164,8 +184,12 @@ class Layers extends Box {
   IVector mp(int px, int py) {return new IVector(mx(px), my(py));}
   
   Layer get_layer(int i) {
-    if(!(i<0) && i<ls.size())return ls.get(i);
+    if(!(i<0) && i<ml.nl())return ls.get(i);
     else return null;
+  }
+  
+  int nl() { // number_of_layer
+    return ls.size();
   }
   
   void set_chip(IVector ps, IVector s) {
@@ -185,7 +209,7 @@ class Layers extends Box {
       mask.draw((Box)this, a);
       tint(255, 100);
     }
-    for(int i=0;i<ml.n;i++){
+    for(int i=0;i<nl();i++){
       if(get_layer(i).disp)get_layer(i).draw((Box)this, a);
     }
     noTint();
@@ -261,7 +285,7 @@ class Layers extends Box {
     PGraphics sl = createGraphics(cs.x*ml.e.c, cs.y*ml.e.c); //save_layer
     sl.beginDraw();
     //sl.background(0);
-    for(int i=0;i<ml.n;i++) {
+    for(int i=0;i<nl();i++) {
       if(get_layer(i).disp)sl.image(get_layer(i).l, 0, 0);
     }
     sl.endDraw();
@@ -420,13 +444,14 @@ class LButton extends Box { // MapLayer_Button
   MapLayer ml;
   Layer l;
   
-  //int n; // number
+  int n; // number
   int cs; // content_size
   //boolean pr; // pressed
   
-  LButton(MapLayer ml, Layer l, IVector ps) {
+  LButton(MapLayer ml, Layer l, int n, IVector ps) {
     this.ml = ml;
     this.l = l;
+    this.n = n;
     
     p = new IVector(ps.x, ps.y);
     s = new IVector(0, 0);
@@ -453,14 +478,14 @@ class LButton extends Box { // MapLayer_Button
     textAlign(CENTER, CENTER);
     textSize(cs);
     fill(0);
-    text("layer "+get_n(), cx(0)+s.x*.5, cy(0)+s.y*.5);
+    text(get_ct(), cx(0)+s.x*.5, cy(0)+s.y*.5);
     
     if(ml.e.d)area();
   }
   
   void set_cs(int cs) {
     this.cs = cs;
-    s.x = (this.cs/3*2+2)*("layer".length()+2);
+    s.x = (this.cs/3*2+2)*(get_ct().length());
     s.y = this.cs+5;
   }
   
@@ -475,6 +500,16 @@ class LButton extends Box { // MapLayer_Button
     else if(mouseButton ==LEFT)ml.ls.now = get_n();
     
     return true;
+  }
+  
+  boolean key_release_event(int mx, int my) {
+    if(!this.inside(mx, my))return false;
+    if(keyCode==BACKSPACE)ml.del_layer(this);
+    return true;
+  }
+  
+  String get_ct() {
+    return "layer "+this.n;
   }
   
   int get_n() {
