@@ -4,11 +4,13 @@ class MEditer extends Box {
   boolean d; //debug
   
   Gui g;
-  MapLayer ml;
   SideBar sb;
+  MapLayer ml;
   Input i;
   
   PImage bt_img;
+  
+  boolean pr; // mouse_press
   
   MEditer() {
     c = 16;
@@ -54,7 +56,10 @@ class MEditer extends Box {
   
   void mouseReleased(){
     if(i.md) {
-      if(sb.release_event(mouseX, mouseY)) {}
+      if(sb.release_event(mouseX, mouseY)) {
+      }else if(g.release_event(mouseX, mouseY)) {
+      }else if(ml.release_event(mouseX, mouseY)) {}
+      
     }
     i.mouseReleased();
     

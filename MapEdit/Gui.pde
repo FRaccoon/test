@@ -5,6 +5,8 @@ class Gui extends Box {
   GButton[] bs;
   String[] ct = {"import", "save", "add_l", "fill", "pen", "eraser", "mask"};
   
+  boolean pr; // mouse_press
+  
   Gui(MEditer e) {
     this.e = e;
     
@@ -17,6 +19,8 @@ class Gui extends Box {
     for(int i=1;i<bs.length;i++) {
       bs[i] = new GButton(this, i, bs[i-1].p.x+bs[i-1].s.x, bs[i-1].p.y);
     }
+    pr = false;
+    
   }
   
   int px(int px) {return e.px(px)-p.x;}
@@ -37,10 +41,17 @@ class Gui extends Box {
   
   boolean press_event(int mx, int my) {
     if(!this.inside(mx, my))return false;
+    pr = true;
     
     for(int i=0;i<bs.length;i++) {
       if(bs[i].press_event(mx, my))break;
     }
+    return true;
+  }
+  
+  boolean release_event(int mx, int my) {
+    pr = false;
+    if(!this.inside(mx, my))return false;
     return true;
   }
   

@@ -2,9 +2,9 @@
 class Input {
   MEditer e;
   
-  boolean kw, ka, ks, kd;
+  boolean kw, ka, ks, kd, kz;
   boolean kup, kdown, kleft, kright, kshift, kbs;
-  boolean md;
+  boolean md, mbr, mbl;
   
   Input(MEditer e) {
     this.e = e;
@@ -13,6 +13,7 @@ class Input {
     ka = false;
     ks = false;
     kd = false;
+    kz = false;
     
     kup = false;
     kdown = false;
@@ -25,60 +26,85 @@ class Input {
     
   }
   
+  boolean pk(char k) { // pressed_key
+    boolean r = false;
+    switch(k) {
+      case 'w':r=kw;break;
+      case 'a':r=ka;break;
+      case 's':r=ks;break;
+      case 'd':r=kd;break;
+      case 'z':r=kz;break;
+      default:break;
+    }
+    return r;
+  }
+  
+  boolean pkc(int k) { // pressed_keyCode
+    boolean r = false;
+    switch(k) {
+      case UP:r=kup;break;
+      case DOWN:r=kdown;break;
+      case LEFT:r=kleft;break;
+      case RIGHT:r=kright;break;
+      case SHIFT:r=kshift;break;
+      case BACKSPACE:r=kbs;break;
+      default:break;
+    }
+    return r;
+  }
+  
+  void sk(char k, boolean t) { // set_key
+    switch(k) {
+      case 'w':kw=t;break;
+      case 'a':ka=t;break;
+      case 's':ks=t;break;
+      case 'd':kd=t;break;
+      case 'z':kz=t;break;
+      default:break;
+    }
+  }
+  
+  void skc(int k, boolean t) { // set_keyCode
+    switch(k) {
+      case UP:kup=t;break;
+      case DOWN:kdown=t;break;
+      case LEFT:kleft=t;break;
+      case RIGHT:kright=t;break;
+      case SHIFT:kshift=t;break;
+      case BACKSPACE:kbs=t;break;
+      default:break;
+    }
+  }
+  
   void keyPressed() {
     if(key==CODED) {
-      switch(keyCode) {
-       case UP:kup=true;break;
-       case DOWN:kdown=true;break;
-       case LEFT:kleft=true;break;
-       case RIGHT:kright=true;break;
-       case SHIFT:kshift=true;break;
-       case BACKSPACE:kbs=true;break;
-       default:break;
-      }
+      skc(keyCode, true);
     }else {
-      switch(key) {
-       case 'w':kw=true;break;
-       case 'a':ka=true;break;
-       case 's':ks=true;break;
-       case 'd':kd=true;break;
-       default:break;
-      }
+      sk(key, true);
     }
     
   }
   
   void keyReleased() {
     if(key==CODED) {
-      switch(keyCode) {
-       case UP:kup=false;break;
-       case DOWN:kdown=false;break;
-       case LEFT:kleft=false;break;
-       case RIGHT:kright=false;break;
-       case SHIFT:kshift=false;break;
-       case BACKSPACE:kbs=false;break;
-       default:break;
-      }
+      skc(keyCode, false);
     }else {
-      switch(key) {
-       case 'w':kw=false;break;
-       case 'a':ka=false;break;
-       case 's':ks=false;break;
-       case 'd':kd=false;break;
-       default:break;
-      }
+      sk(key, false);
     }
     
   }
   
   void mousePressed() {
     if(!md)md = true;
-    
   }
   
   void mouseReleased() {
     if(md)md = false;
     
+  }
+  
+  boolean mb(int v) {
+    return (mouseButton==v);
   }
   
   //void mouseWheel(int delta) {}
