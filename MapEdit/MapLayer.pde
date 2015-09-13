@@ -259,8 +259,13 @@ class Layers extends ImgDisp {
             get_layer(now).paint(chip, mp);
             pm.set(mp);
           }else {
-            mp.sub(mp.get().sub(pm).mod(chip.cs));
-            if(!pm.equals(mp))get_layer(now).paint(chip, mp);
+            mp = mp(mouseX, mouseY);
+            mp.set(mp.get().sub(pm).div(chip.cs).sub(mp.x<pm.x?1:0, mp.y<pm.y?1:0));
+            if(!mp.equals(0)) {
+              mp.set(mp.scl(chip.cs).add(pm));
+              get_layer(now).paint(chip, mp);
+              pm.set(mp);
+            }
           }
         }else if(!pm.equals(mp)) {
           get_layer(now).erase(mp, chip.cs);
