@@ -1,5 +1,5 @@
 
-class MEditer extends Box {
+class MEditor extends Box {
   int c; // chip_size
   boolean d; //debug
   
@@ -12,7 +12,7 @@ class MEditer extends Box {
   
   boolean pr; // mouse_press
   
-  MEditer() {
+  MEditor() {
     c = 16;
     d = true;
     

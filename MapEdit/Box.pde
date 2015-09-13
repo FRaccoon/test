@@ -63,8 +63,8 @@ class IVector { // int_vector
   }
   
   IVector mod(int mx, int my) {
-    if(x>0)this.x %= mx;
-    if(y>0)this.y %= my;
+    this.x %= mx;
+    this.y %= my;
     return this;
   }
   

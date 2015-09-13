@@ -1,12 +1,12 @@
 
 class Input {
-  MEditer e;
+  MEditor e;
   
   boolean kw, ka, ks, kd, kz;
   boolean kup, kdown, kleft, kright, kshift, kbs;
   boolean md, mbr, mbl;
   
-  Input(MEditer e) {
+  Input(MEditor e) {
     this.e = e;
     
     kw = false;

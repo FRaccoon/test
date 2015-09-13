@@ -1,11 +1,11 @@
 
 class SideBar extends Box {
-  MEditer e;
+  MEditor e;
   
   Chip cp;
   Material mat;
   
-  SideBar(MEditer e) {
+  SideBar(MEditor e) {
     this.e = e;
     
     p = new IVector(e.s.x-e.c*10, 0); // e.c*10);

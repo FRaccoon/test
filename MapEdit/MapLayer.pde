@@ -1,6 +1,6 @@
 
 class MapLayer extends Box {
-  MEditer e;
+  MEditor e;
   
   Layers ls;
   ArrayList<LButton> lb;
@@ -8,7 +8,7 @@ class MapLayer extends Box {
   IVector bp; //button_pos
   int n;
   
-  MapLayer(MEditer e) {
+  MapLayer(MEditor e) {
     this.e = e;
     
     p = new IVector(0, 33);
@@ -314,11 +314,9 @@ class Layers extends Box {
       IVector mp = mp(mouseX, mouseY);
       if(et) {
         if(tt) {
-          if( (ml.e.i.pk('z') && !pm.equals(mp)) || 
-          (mp.x>=pm.x+chip.cs.x || mp.x<=pm.x-chip.cs.x) || 
-          (mp.y>=pm.y+chip.cs.y || mp.y<=pm.y-chip.cs.y) ){
+          if((ml.e.i.pk('z') && !pm.equals(mp)) || mp.get().sub(pm).mod(chip.cs).equals(0, 0)){
             get_layer(now).paint(chip, mp);
-            pm.set(mp);
+            //pm.set(mp);
           }
         }else if(!pm.equals(mp)) {
           get_layer(now).erase(mp, chip.cs);

@@ -1,13 +1,13 @@
 
 class Gui extends Box {
-  MEditer e;
+  MEditor e;
   
   GButton[] bs;
   String[] ct = {"import", "save", "add_l", "fill", "pen", "eraser", "mask"};
   
   boolean pr; // mouse_press
   
-  Gui(MEditer e) {
+  Gui(MEditor e) {
     this.e = e;
     
     p = new IVector(0, 0);

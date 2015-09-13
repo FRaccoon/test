@@ -1,37 +1,37 @@
 import java.awt.*;
 import javax.swing.*;
 
-MEditer mediter;
+MEditor meditor;
 
 void setup(){
   size(720, 500);
   
-  mediter = new MEditer();
+  meditor = new MEditor();
   
 }
 
 void draw(){
   background(0);
-  mediter.update();
-  mediter.draw();
+  meditor.update();
+  meditor.draw();
 }
 
 void mousePressed(){
-  mediter.mousePressed();
+  meditor.mousePressed();
 }
 
 void mouseReleased(){
-  mediter.mouseReleased();
+  meditor.mouseReleased();
 }
 
 void mouseWheel(MouseEvent event) {
-  mediter.mouseWheel(event.getCount());
+  meditor.mouseWheel(event.getCount());
 }
 
 void keyPressed(){
-  mediter.keyPressed();
+  meditor.keyPressed();
 }
 
 void keyReleased(){
-  mediter.keyReleased();
+  meditor.keyReleased();
 }
