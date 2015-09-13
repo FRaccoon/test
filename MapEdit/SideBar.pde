@@ -85,7 +85,8 @@ class Chip extends ImgDisp {
   int cy(int cy) {return sb.cy(cy+p.y);}
   
   void update() {
-    if(inside(mouseX, mouseY))this.scroll(sb.e.i);
+    if(!inside(mouseX, mouseY))return ;
+    this.scroll(sb.e.i);
     this.limit();
   }
   
@@ -116,12 +117,13 @@ class Material extends ImgDisp {
     
     ss = 18;
     a = new IVector(0);
-    ms = new IVector(0, 2*s.y/3);
+    ms = new IVector(0, s.y/3);
     
     pr = false;
     
     img = new EImage();
     img.set_img(loadImage("base_img.png"));
+    this.limit();
     
   }
   
@@ -137,7 +139,8 @@ class Material extends ImgDisp {
   IVector mp(int mx, int my) {return new IVector(mx(mx), my(my));}
   
   void update() {
-    if(inside(mouseX, mouseY))this.scroll(sb.e.i);
+    if(!inside(mouseX, mouseY))return ;
+    this.scroll(sb.e.i);
     this.limit();
   }
   

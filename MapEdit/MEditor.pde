@@ -14,7 +14,7 @@ class MEditor extends Box {
   
   MEditor() {
     c = 16;
-    d = true;
+    d = false;
     
     p = new IVector(0, 0);
     s = new IVector(width, height); // 720, 500

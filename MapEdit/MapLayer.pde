@@ -150,7 +150,8 @@ class Layers extends ImgDisp {
   Layer chip;
   PImage mat;
   
-  boolean et, tt; //  eidt_type: true: layer, false: mask; tool_type true: pen(white), false: eraser(black)
+  boolean et; //  eidt_type: true: layer, false: mask(img);
+  int tt; // tool_type 0: pen(white), 1: eraser(black), 2: select
   IVector pm; // p_mouse
   
   EImage bg_img;
@@ -170,7 +171,7 @@ class Layers extends ImgDisp {
     ms = new IVector(2*s.x/3, 2*s.y/3);
     
     et = true;
-    tt = true;
+    tt = 0;
     
     pm = new IVector(0);
     
@@ -178,8 +179,8 @@ class Layers extends ImgDisp {
     this.now=0;
     
     chip = new Layer(this, new IVector(1, 1));
-    set_chip(ml.e.sb.mat.img, new IVector(0), new IVector(1));
     ml.e.sb.cp.img = chip;
+    set_chip(ml.e.sb.mat.img, new IVector(0), new IVector(1));
     
     bg_img = new EImage();
     bg_img.set_size(this.s);
@@ -190,6 +191,8 @@ class Layers extends ImgDisp {
     img.fill_color(color(0));
     
     pr = false;
+    
+    this.limit();
     
   }
   
@@ -205,7 +208,7 @@ class Layers extends ImgDisp {
   int sx(int px) {return px-(chip.cs.x-1)*ml.e.c/2;}
   int sy(int py) {return py-(chip.cs.y-1)*ml.e.c/2;}
   
-  IVector mp(int px, int py) {return new IVector(mx(sx(px)), my(sy(py)));}
+  IVector mp(int px, int py) {return new IVector(mx(px), my(py));}
   IVector msp(int px, int py) {return this.mp(sx(px), sy(py));}
   
   Layer get_layer(int i) {
@@ -228,6 +231,8 @@ class Layers extends ImgDisp {
       }
     }
     chip.paint_pimg(mat.get(ps.mult(ml.e.c), s.mult(ml.e.c)), new IVector(0));
+    ml.e.sb.cp.a.set(0);
+    ml.e.sb.cp.limit();
   }
   
   void set_chip(EImage mat, IVector ps, IVector s) {
@@ -239,6 +244,37 @@ class Layers extends ImgDisp {
       }
     }
     chip.paint_pimg(mat.get(ps.mult(ml.e.c), s.mult(ml.e.c)), new IVector(0));
+    ml.e.sb.cp.a.set(0);
+    ml.e.sb.cp.limit();
+  }
+  
+  void update() {
+    if(!inside(mouseX, mouseY))return ;
+    
+    if(pr && tt<2) { // edit(pen, eraser)
+      IVector mp = msp(mouseX, mouseY);
+      if(et) {
+        if(tt==0) {
+          if(ml.e.i.pk('z') && !pm.equals(mp)) {
+            get_layer(now).paint(chip, mp);
+            pm.set(mp);
+          }else {
+            mp.sub(mp.get().sub(pm).mod(chip.cs));
+            if(!pm.equals(mp))get_layer(now).paint(chip, mp);
+          }
+        }else if(!pm.equals(mp)) {
+          get_layer(now).erase(mp, chip.cs);
+          pm.set(mp);
+        }
+      }else if(!pm.equals(mp)) {
+        img.paint_color(tt==0?color(255):color(0), mp.mult(ml.e.c), chip.cs.mult(ml.e.c));
+        pm.set(mp);
+      }
+    }
+    
+    this.scroll(ml.e.i);
+    this.limit();
+    
   }
   
   void draw() {
@@ -256,27 +292,37 @@ class Layers extends ImgDisp {
     rect(cx(-a.x), cy(-a.y), cs.x*ml.e.c, cs.y*ml.e.c);
     
     if(inside(mouseX, mouseY)) {
-      if(pr && ml.e.i.mb(RIGHT)) {
+      if(pr && tt==2) {
         IVector xp = mp(mouseX, mouseY), ip = mp(mouseX, mouseY);
         xp.max(pm);
         ip.min(pm);
         
-        stroke(tt?255:0);
+        stroke(tt==0?255:0);
         fill(0, 204, 255, 100);
         cp(ip.mult(ml.e.c)).sub(a).box(xp.sub(ip).add(1).mult(ml.e.c));
         
       }else {
         Box mc = new Box(); // mouse_cursor
-        mc.p = cp(msp(mouseX, mouseY).mult(ml.e.c).sub(a));
-        mc.s = chip.cs.mult(ml.e.c);
+        if(tt<2) {
+          mc.p = cp(msp(mouseX, mouseY).mult(ml.e.c).sub(a));
+          mc.s = chip.cs.mult(ml.e.c);
+        }else {
+          mc.p = cp(mp(mouseX, mouseY).mult(ml.e.c).sub(a));
+          mc.s = new IVector(ml.e.c);
+        }
         
-        if(et && tt) {
+        if(et && tt==0) {
           tint(255, 156);
           chip.draw(mc);
           noTint();
         }
         
-        stroke(tt?255:0);
+        switch(tt) {
+          case 0:stroke(255);break;
+          case 1:stroke(0);break;
+          case 2:stroke(0,204,255);break;
+          default:stroke(255,0,0);break;
+        }
         fill(0, 204, 255, 100);
         mc.box();
         
@@ -292,49 +338,17 @@ class Layers extends ImgDisp {
     if(ml.e.d)area();
   }
   
-  void update() {
-    if(inside(mouseX, mouseY)) {
-      
-      this.scroll(ml.e.i);
-      
-      if(pr && ml.e.i.mb(LEFT)) { // edit
-        IVector mp = msp(mouseX, mouseY);
-        if(et) {
-          if(tt) {
-            if(ml.e.i.pk('z') && !pm.equals(mp)) {
-              get_layer(now).paint(chip, mp);
-              pm.set(mp);
-            }else {
-              mp.sub(mp.get().sub(pm).mod(chip.cs));
-              if(!pm.equals(mp))get_layer(now).paint(chip, mp);
-            }
-          }else if(!pm.equals(mp)) {
-            get_layer(now).erase(mp, chip.cs);
-            pm.set(mp);
-          }
-        }else if(!pm.equals(mp)) {
-          img.paint_color(tt?color(255):color(0), mp.mult(ml.e.c), chip.cs.mult(ml.e.c));
-          pm.set(mp);
-        }
-      }
-      
-    }
-    
-    this.limit();
-    
-  }
-  
   boolean press_event(int mx, int my) {
     if(!this.inside(mx, my))return false;
     
     pr = true;
     
-    if(ml.e.i.mb(LEFT)) {
+    if(tt<2) {
       pm = msp(mouseX, mouseY);
-      if(et && tt)get_layer(now).paint(chip, pm);
+      if(et && tt==0)get_layer(now).paint(chip, pm);
       else if(et)get_layer(now).erase(pm, chip.cs);
-      else img.paint_color(tt?color(255):color(0), pm.mult(ml.e.c), chip.cs.mult(ml.e.c));
-    }else if(ml.e.i.mb(RIGHT)) {
+      else img.paint_color(tt==0?color(255):color(0), pm.mult(ml.e.c), chip.cs.mult(ml.e.c));
+    }else if(tt==2) {
       pm = mp(mouseX, mouseY);
     }
     
@@ -345,7 +359,7 @@ class Layers extends ImgDisp {
     pr = false;
     if(!this.inside(mx, my))return false;
     
-    if(ml.e.i.mb(RIGHT)) {
+    if(tt==2) {
       Layer l = get_layer(now);
       IVector xp = mp(mx, my), ip = mp(mx, my); //<>//
       xp.max(pm);
@@ -364,6 +378,7 @@ class Layers extends ImgDisp {
   }
   
   void auto_fill(IVector sp) {
+    if(tt>1)return ;
     int[] dx = { 1, 0,-1, 0}, dy = { 0, 1, 0,-1};
     boolean[][] t = new boolean[cs.x][cs.y];
     for(int i=0;i<cs.x;i++){for(int j=0;j<cs.y;j++){
@@ -396,7 +411,7 @@ class Layers extends ImgDisp {
       for(int i=ip.x;i<=xp.x;i++) {for(int j=ip.y;j<=xp.y;j++) {
         if(t[i][j]) {
           IVector cp = new IVector(i, j);
-          if(tt) {
+          if(tt==0) {
             cp.sub(ip);
             cp.mod(chip.cs);
             l.t[i][j] = chip.t[cp.x][cp.y];
@@ -431,7 +446,7 @@ class Layers extends ImgDisp {
       
       for(int i=ip.x;i<=xp.x;i++) {for(int j=ip.y;j<=xp.y;j++) {
           IVector cp = new IVector(i, j);
-          if(t[i][j])img.paint_color(tt?color(255):color(0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
+          if(t[i][j])img.paint_color(tt==0?color(255):color(0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
       }}
       
     }
@@ -445,11 +460,12 @@ class Layers extends ImgDisp {
   }
   
   void fill_layer() {
+    if(tt>1)return ;
     if(et) {
-      if(tt)ls.get(now).paint_all(chip);
+      if(tt==0)ls.get(now).paint_all(chip);
       else ls.get(now).erase_all();
     }else {
-      img.fill_color(tt?color(255):color(0));
+      img.fill_color(tt==0?color(255):color(0));
     }
   }
   
