@@ -10,7 +10,7 @@ class Gui extends Box {
   Gui(MEditor e) {
     this.e = e;
     
-    p = new IVector(0, 0);
+    p = new IVector(0);
     s = new IVector(e.s.x-160, 33);
     
     bs = new GButton[ct.length];
@@ -55,12 +55,6 @@ class Gui extends Box {
     return true;
   }
   
-  /*void Scrollbar(int x, int y, int widthScrollbar, float part) {
-     fill(0);
-     triangle(x+4, y+2, x+12, y+2, x+8, y+(sqrt(3)*5)+2);
-     triangle(x+4, y+widthScrollbar-2, x+12, y+widthScrollbar-2, x+8, y-(sqrt(3)*5)+widthScrollbar-2);
-  }*/
-  
 }
 
 class GButton extends Box { // Gui_Button
@@ -74,7 +68,7 @@ class GButton extends Box { // Gui_Button
     
     this.t = t;
     p = new IVector(px, py);
-    s = new IVector(0, 0);
+    s = new IVector(0);
     set_cs(12);
     
     pr = false;
@@ -130,7 +124,7 @@ class GButton extends Box { // Gui_Button
     pr = true;
     
     switch(t) {
-      case 0:g.e.ml.ls.imp();break; // import
+      case 0:g.e.ml.ls.import_file();break; // import
       case 1:g.e.ml.ls.save();break; // save
       case 2:g.e.ml.add_layer();break; //add_l
       case 3:g.e.ml.ls.fill_layer();break; // fill

@@ -45,9 +45,9 @@ class MEditor extends Box {
   
   void mousePressed(){
     if(!i.md) {
-      if(sb.press_event(mouseX, mouseY)) {
-      }else if(g.press_event(mouseX, mouseY)) {
-      }else if(ml.press_event(mouseX, mouseY)) {}
+      if(sb.press_event(mouseX, mouseY)) {}
+      else if(g.press_event(mouseX, mouseY)) {}
+      else if(ml.press_event(mouseX, mouseY)) {}
       
     }
     i.mousePressed();
@@ -56,9 +56,9 @@ class MEditor extends Box {
   
   void mouseReleased(){
     if(i.md) {
-      if(sb.release_event(mouseX, mouseY)) {
-      }else if(g.release_event(mouseX, mouseY)) {
-      }else if(ml.release_event(mouseX, mouseY)) {}
+      if(sb.release_event(mouseX, mouseY)) {}
+      else if(g.release_event(mouseX, mouseY)) {}
+      else if(ml.release_event(mouseX, mouseY)) {}
       
     }
     i.mouseReleased();

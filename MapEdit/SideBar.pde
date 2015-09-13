@@ -54,7 +54,8 @@ class SideBar extends Box {
   boolean wheel_event(int delta) {
     if(!inside(mouseX, mouseY))return false;
     
-    if(mat.wheel_event(delta)) {}
+    if(cp.wheel_event(delta)) {}
+    else if(mat.wheel_event(delta)) {}
     
     return true;
     
@@ -62,20 +63,18 @@ class SideBar extends Box {
   
 }
 
-class Chip extends Box {
+class Chip extends ImgDisp {
   SideBar sb;
-  
-  EImage img;
-  
-  IVector a;
   
   Chip(SideBar sb) {
     this.sb = sb;
     
-    p = new IVector(sb.e.c, sb.e.c);
-    s = new IVector(sb.e.c*8, sb.e.c*8);
+    p = new IVector(sb.e.c);
+    s = new IVector(sb.e.c*8);
     
-    a = new IVector(0 ,0);
+    ss = 4;
+    a = new IVector(0);
+    ms = new IVector(sb.e.c);
     
   }
   
@@ -86,7 +85,8 @@ class Chip extends Box {
   int cy(int cy) {return sb.cy(cy+p.y);}
   
   void update() {
-    a.set((img.l.width-s.x)/2, (img.l.height-s.y)/2);
+    if(inside(mouseX, mouseY))this.scroll(sb.e.i);
+    this.limit();
   }
   
   void draw() {
@@ -100,12 +100,8 @@ class Chip extends Box {
   
 }
 
-class Material extends Box {
+class Material extends ImgDisp {
   SideBar sb;
-  EImage img;
-  
-  int ss; // scroll_speed;
-  IVector a, ms; // (a.x, a.y) = (0, 0); ms: margin_size
   
   IVector pm; // mouse_position
   boolean pr; // mouse_press
@@ -116,11 +112,11 @@ class Material extends Box {
     p = new IVector(0, sb.s.x);
     s = new IVector(sb.s.x, sb.s.y-sb.s.x);
     
-    pm = new IVector(0, 0);
+    pm = new IVector(0);
     
     ss = 18;
-    a = new IVector(-sb.e.c, 0);
-    ms = new IVector(2*s.x/3, 2*s.y/3);
+    a = new IVector(0);
+    ms = new IVector(0, 2*s.y/3);
     
     pr = false;
     
@@ -138,18 +134,11 @@ class Material extends Box {
   int mx(int px) {return (px(px+a.x)/sb.e.c)-(px(px+a.x)<0?1:0);}
   int my(int py) {return (py(py+a.y)/sb.e.c)-(py(py+a.y)<0?1:0);}
   
+  IVector mp(int mx, int my) {return new IVector(mx(mx), my(my));}
+  
   void update() {
-    if(inside(mouseX, mouseY)) {
-      if(sb.e.i.pk('w') || sb.e.i.pkc(UP))a.y-=ss;
-      if(sb.e.i.pk('s') || sb.e.i.pkc(DOWN))a.y+=ss;
-      
-      //if(a.y<-ms.x)a.x=-ms.x;
-      if(a.y<-ms.y)a.y=-ms.y;
-      //if(a.x>img.l.width+ms.x-s.x)a.x=img.l.width+ms.x-s.x;
-      if(a.y>img.l.height+ms.y-s.y)a.y=img.l.height+ms.y-s.y;
-      
-    }
-    
+    if(inside(mouseX, mouseY))this.scroll(sb.e.i);
+    this.limit();
   }
   
   void draw() {
@@ -159,9 +148,10 @@ class Material extends Box {
     fill(0, 204, 255, 100);
     if(pr) {
       if(sb.e.i.mb(LEFT)) {
-        IVector xp = new IVector(max(pm.x, mx(mouseX)), max(pm.y, my(mouseY))),
-        ip = new IVector(min(pm.x, mx(mouseX)), min(pm.y, my(mouseY)));
-        cp(ip.mult(sb.e.c)).sub(a).box(xp.sub(ip).add(1, 1).mult(sb.e.c));
+        IVector xp = mp(mouseX, mouseY),ip = mp(mouseX, mouseY);
+        xp.max(pm);
+        ip.min(pm);
+        cp(ip.mult(sb.e.c)).sub(a).box(xp.sub(ip).add(1).mult(sb.e.c));
       }
     }
     
@@ -174,7 +164,7 @@ class Material extends Box {
     pr = true;
     
     pm.set(mx(mouseX), my(mouseY));
-    sb.e.ml.ls.set_chip(img, pm, new IVector(1, 1));
+    sb.e.ml.ls.set_chip(img, pm, new IVector(1));
     
     return true;
   }
@@ -184,26 +174,13 @@ class Material extends Box {
     if(!this.inside(mx, my))return false;
     
     if(sb.e.i.mb(LEFT)) {
-      IVector mp = new IVector(max(pm.x, mx(mouseX)), max(pm.y, my(mouseY)));
-      pm.set(min(pm.x, mx(mouseX)), min(pm.y, my(mouseY)));
+      IVector mp = mp(mouseX, mouseY).max(pm);
+      pm.min(mp(mouseX, mouseY));
       
-      sb.e.ml.ls.set_chip(img, pm, mp.sub(pm).add(1, 1));
+      sb.e.ml.ls.set_chip(img, pm, mp.sub(pm).add(1));
     }
     
     return true;
-  }
-  
-  boolean wheel_event(int delta) {
-    if(!inside(mouseX, mouseY))return false;
-    a.y += delta*ss;
-    
-    //if(a.y<-ms.x)a.x=-ms.x;
-    if(a.y<-ms.y)a.y=-ms.y;
-    //if(a.x>img.l.width+ms.x-s.x)a.x=img.l.width+ms.x-s.x;
-    if(a.y>img.l.height+ms.y-s.y)a.y=img.l.height+ms.y-s.y;
-    
-    return true;
-    
   }
   
 }

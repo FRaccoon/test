@@ -71,7 +71,7 @@ class MapLayer extends Box {
   }
   
   void update() {
-    if(ls.update()) {}
+    ls.update();
   }
   
   boolean press_event(int mx, int my) {
@@ -125,25 +125,23 @@ class MapLayer extends Box {
     
     JOptionPane.showConfirmDialog( null, panel, "layer size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
     
-    int gX = 0, gY = 0;
+    IVector g = new IVector(0);
     try{
-      gX = int(text1.getText());
-      gY = int(text2.getText());
+      g.set( int(text1.getText()), int(text2.getText()) );
     }catch(NumberFormatException e){
     }catch(NullPointerException e){
     }
     
-    return new IVector(gX==0?50:gX, gY==0?50:gY);
+    return g.set(g.x==0?50:g.x, g.y==0?50:g.y);
     
   }
   
 }
 
-class Layers extends Box {
+class Layers extends ImgDisp {
   MapLayer ml;
   
   IVector cs; // canvas_size (chip)
-  IVector a; // (a.x, a.y) = (0, 0)
   
   ArrayList<Layer> ls;
   
@@ -156,10 +154,7 @@ class Layers extends Box {
   IVector pm; // p_mouse
   
   EImage bg_img;
-  EImage mask;
-  
-  int ss; // scroll_speed
-  IVector ms; // margin_size
+  // img is mask
   
   boolean pr; // mouse_press
   
@@ -170,30 +165,29 @@ class Layers extends Box {
     this.cs = cs;
     s = new IVector(34*ml.e.c, 25*ml.e.c);
     
-    a = new IVector(0, 0);
+    ss = 10;
+    a = new IVector(0);
+    ms = new IVector(2*s.x/3, 2*s.y/3);
     
     et = true;
     tt = true;
     
-    pm = new IVector(0, 0);
+    pm = new IVector(0);
     
     ls = new ArrayList<Layer>();
     this.now=0;
     
     chip = new Layer(this, new IVector(1, 1));
-    set_chip(ml.e.sb.mat.img, new IVector(0, 0), new IVector(1, 1));
+    set_chip(ml.e.sb.mat.img, new IVector(0), new IVector(1));
     ml.e.sb.cp.img = chip;
     
     bg_img = new EImage();
     bg_img.set_size(this.s);
     bg_img.fill_pimg(loadImage("./data/bg_img.png"));
     
-    mask = new EImage();
-    mask.set_size(this.cs.mult(ml.e.c));
-    mask.fill_color(color(0));
-    
-    ss = 10;
-    ms = new IVector(2*s.x/3, 2*s.y/3);
+    img = new EImage();
+    img.set_size(this.cs.mult(ml.e.c));
+    img.fill_color(color(0));
     
     pr = false;
     
@@ -212,6 +206,7 @@ class Layers extends Box {
   int sy(int py) {return py-(chip.cs.y-1)*ml.e.c/2;}
   
   IVector mp(int px, int py) {return new IVector(mx(sx(px)), my(sy(py)));}
+  IVector msp(int px, int py) {return this.mp(sx(px), sy(py));}
   
   Layer get_layer(int i) {
     if(!(i<0) && i<ml.nl())return ls.get(i);
@@ -232,7 +227,7 @@ class Layers extends Box {
         chip.t[i][j] = mat.t[i+ps.x][j+ps.y];
       }
     }
-    chip.paint_pimg(mat.get(ps.mult(ml.e.c), s.mult(ml.e.c)), new IVector(0, 0));
+    chip.paint_pimg(mat.get(ps.mult(ml.e.c), s.mult(ml.e.c)), new IVector(0));
   }
   
   void set_chip(EImage mat, IVector ps, IVector s) {
@@ -240,16 +235,16 @@ class Layers extends Box {
     chip.reset();
     for(int i=0;i<s.x;i++) {
       for(int j=0;j<s.y;j++) {
-        chip.t[i][j] = (i+ps.x)+(mat.l.width/ml.e.c)*(j+ps.y);
+        chip.t[i][j] = (i+ps.x)+(mat.wid()/ml.e.c)*(j+ps.y);
       }
     }
-    chip.paint_pimg(mat.get(ps.mult(ml.e.c), s.mult(ml.e.c)), new IVector(0, 0));
+    chip.paint_pimg(mat.get(ps.mult(ml.e.c), s.mult(ml.e.c)), new IVector(0));
   }
   
   void draw() {
    bg_img.draw((Box)this);
     if(!et) {
-      mask.draw((Box)this, a);
+      img.draw((Box)this, a);
       tint(255, 100);
     }
     for(int i=0;i<nl();i++){
@@ -262,17 +257,17 @@ class Layers extends Box {
     
     if(inside(mouseX, mouseY)) {
       if(pr && ml.e.i.mb(RIGHT)) {
-        IVector mp = new IVector(mx(mouseX), my(mouseY));
-        IVector xp = new IVector(max(pm.x, mp.x), max(pm.y, mp.y)),
-        ip = new IVector(min(pm.x, mp.x), min(pm.y, mp.y));
+        IVector xp = mp(mouseX, mouseY), ip = mp(mouseX, mouseY);
+        xp.max(pm);
+        ip.min(pm);
         
         stroke(tt?255:0);
         fill(0, 204, 255, 100);
-        cp(ip.mult(ml.e.c)).sub(a).box(xp.sub(ip).add(1, 1).mult(ml.e.c));
+        cp(ip.mult(ml.e.c)).sub(a).box(xp.sub(ip).add(1).mult(ml.e.c));
         
       }else {
         Box mc = new Box(); // mouse_cursor
-        mc.p = cp(mp(mouseX, mouseY).mult(ml.e.c).sub(a));
+        mc.p = cp(msp(mouseX, mouseY).mult(ml.e.c).sub(a));
         mc.s = chip.cs.mult(ml.e.c);
         
         if(et && tt) {
@@ -297,38 +292,36 @@ class Layers extends Box {
     if(ml.e.d)area();
   }
   
-  boolean update() {
-    if(!inside(mouseX, mouseY))return false;
-    
-    if(ml.e.i.pk('a') || ml.e.i.pkc(LEFT))a.x-=ss;
-    if(ml.e.i.pk('w') || ml.e.i.pkc(UP))a.y-=ss;
-    if(ml.e.i.pk('d') || ml.e.i.pkc(RIGHT))a.x+=ss;
-    if(ml.e.i.pk('s') || ml.e.i.pkc(DOWN))a.y+=ss;
-    
-    if(a.x<-ms.x)a.x=-ms.x;
-    if(a.y<-ms.y)a.y=-ms.y;
-    if(a.x>cs.x*ml.e.c+ms.x-s.x)a.x=cs.x*ml.e.c+ms.x-s.x;
-    if(a.y>cs.y*ml.e.c+ms.y-s.y)a.y=cs.y*ml.e.c+ms.y-s.y;
-    
-    if(pr && ml.e.i.mb(LEFT)) { // edit
-      IVector mp = mp(mouseX, mouseY);
-      if(et) {
-        if(tt) {
-          if((ml.e.i.pk('z') && !pm.equals(mp)) || mp.get().sub(pm).mod(chip.cs).equals(0, 0)){
-            get_layer(now).paint(chip, mp);
-            //pm.set(mp);
+  void update() {
+    if(inside(mouseX, mouseY)) {
+      
+      this.scroll(ml.e.i);
+      
+      if(pr && ml.e.i.mb(LEFT)) { // edit
+        IVector mp = msp(mouseX, mouseY);
+        if(et) {
+          if(tt) {
+            if(ml.e.i.pk('z') && !pm.equals(mp)) {
+              get_layer(now).paint(chip, mp);
+              pm.set(mp);
+            }else {
+              mp.sub(mp.get().sub(pm).mod(chip.cs));
+              if(!pm.equals(mp))get_layer(now).paint(chip, mp);
+            }
+          }else if(!pm.equals(mp)) {
+            get_layer(now).erase(mp, chip.cs);
+            pm.set(mp);
           }
         }else if(!pm.equals(mp)) {
-          get_layer(now).erase(mp, chip.cs);
+          img.paint_color(tt?color(255):color(0), mp.mult(ml.e.c), chip.cs.mult(ml.e.c));
           pm.set(mp);
         }
-      }else if(!pm.equals(mp)) {
-        mask.paint_color(tt?color(255):color(0), mp.mult(ml.e.c), chip.cs.mult(ml.e.c));
-        pm.set(mp);
       }
+      
     }
     
-    return true;
+    this.limit();
+    
   }
   
   boolean press_event(int mx, int my) {
@@ -337,12 +330,12 @@ class Layers extends Box {
     pr = true;
     
     if(ml.e.i.mb(LEFT)) {
-      pm = mp(mouseX, mouseY);
+      pm = msp(mouseX, mouseY);
       if(et && tt)get_layer(now).paint(chip, pm);
       else if(et)get_layer(now).erase(pm, chip.cs);
-      else mask.paint_color(tt?color(255):color(0), pm.mult(ml.e.c), chip.cs.mult(ml.e.c));
+      else img.paint_color(tt?color(255):color(0), pm.mult(ml.e.c), chip.cs.mult(ml.e.c));
     }else if(ml.e.i.mb(RIGHT)) {
-      pm = new IVector(mx(mouseX), my(mouseY));
+      pm = mp(mouseX, mouseY);
     }
     
     return true;
@@ -353,12 +346,12 @@ class Layers extends Box {
     if(!this.inside(mx, my))return false;
     
     if(ml.e.i.mb(RIGHT)) {
-      IVector mp = new IVector(mx(mx), my(my));
       Layer l = get_layer(now);
-      IVector xp = new IVector(max(pm.x, mp.x), max(pm.y, mp.y)),
-      ip = new IVector(min(pm.x, mp.x), min(pm.y, mp.y)); //<>//
+      IVector xp = mp(mx, my), ip = mp(mx, my); //<>//
+      xp.max(pm);
+      ip.min(pm);
       
-      set_chip(l, ip, xp.sub(ip).add(1, 1));
+      set_chip(l, ip, xp.sub(ip).add(1));
     }
     
     return true;
@@ -366,7 +359,7 @@ class Layers extends Box {
   
   boolean key_release_event(int mx, int my) {
     if(!this.inside(mx, my))return false;
-    if(!pr&&key=='f')auto_fill(new IVector(mx(mx), my(my)));
+    if(!pr&&key=='f')auto_fill(mp(mx, my));
     return true;
   }
   
@@ -407,21 +400,21 @@ class Layers extends Box {
             cp.sub(ip);
             cp.mod(chip.cs);
             l.t[i][j] = chip.t[cp.x][cp.y];
-            cp.scalar(ml.e.c);
-            l.paint_pimg(chip.get(cp, new IVector(ml.e.c, ml.e.c)), (new IVector(i, j)).scalar(ml.e.c));
+            cp.scl(ml.e.c);
+            l.paint_pimg(chip.get(cp, new IVector(ml.e.c)), (new IVector(i, j)).scl(ml.e.c));
           }else {
             l.t[i][j] = -1;
-            l.paint_color(color(0, 0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
+            l.paint_color(color(0, 0), cp.mult(ml.e.c), new IVector(ml.e.c));
           }
         }
       }}
       
     }else {
       IVector ip = sp.get(), xp = sp.get();
-      color v = mask.get(sp.mult(ml.e.c));
+      color v = img.get(sp.mult(ml.e.c));
       while(que.size()>0) {
         IVector q = que.get(0);
-        if(!t[q.x][q.y] && mask.get(q.mult(ml.e.c))==v) {
+        if(!t[q.x][q.y] && img.get(q.mult(ml.e.c))==v) {
           t[q.x][q.y] = true;
           if(q.x<ip.x)ip.x=q.x;
           else if(q.x>xp.x)xp.x=q.x;
@@ -438,16 +431,17 @@ class Layers extends Box {
       
       for(int i=ip.x;i<=xp.x;i++) {for(int j=ip.y;j<=xp.y;j++) {
           IVector cp = new IVector(i, j);
-          if(t[i][j])mask.paint_color(tt?color(255):color(0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
+          if(t[i][j])img.paint_color(tt?color(255):color(0), cp.mult(ml.e.c), new IVector(ml.e.c, ml.e.c));
       }}
       
     }
     
   }
   
-  void imp() { // import
-    get_layer(0).paint_pimg(loadImage("./data/o/layer.png"), new IVector(0, 0));
-    mask.paint_pimg(loadImage("./data/o/mask.png"), new IVector(0, 0));
+  void import_file() { // import
+    ml.add_layer();
+    get_layer(nl()-1).paint_pimg(loadImage("./data/o/layer.png"), new IVector(0, 0));
+    img.paint_pimg(loadImage("./data/o/mask.png"), new IVector(0, 0));
   }
   
   void fill_layer() {
@@ -455,7 +449,7 @@ class Layers extends Box {
       if(tt)ls.get(now).paint_all(chip);
       else ls.get(now).erase_all();
     }else {
-      mask.fill_color(tt?color(255):color(0));
+      img.fill_color(tt?color(255):color(0));
     }
   }
   
@@ -470,7 +464,7 @@ class Layers extends Box {
     sl.endDraw();
     
     sl.get().save("./data/o/layer.png");
-    mask.l.get().save("./data/o/mask.png");
+    img.l.get().save("./data/o/mask.png");
     //exit();
   }
   
@@ -540,89 +534,6 @@ class Layer extends EImage {
       }
     }
     fill_color(color(0, 0));
-  }
-  
-}
-
-class EImage {
-  PImage l;
-  
-  EImage() {}
-  
-  void set_size(IVector s) {
-    l = createImage(s.x, s.y, ARGB);
-  }
-  
-  void set_img(PImage l) {
-    this.l = l;
-  }
-  
-  color get(IVector p) {
-    return l.get(p.x, p.y);
-  }
-  
-  PImage get(IVector p, IVector s) {
-    return l.get(p.x, p.y, s.x, s.y);
-  }
-  
-  void draw(Box b) {
-    image(l.get(0, 0, min(l.width, b.s.x), min(l.height, b.s.y)), b.cx(0), b.cy(0));
-  }
-  
-  void draw(Box b, IVector a) {
-    image(
-    l.get(a.x, a.y, 
-    min(l.width-a.x, b.s.x), 
-    min(l.height-a.y, b.s.y)), 
-    b.cx(0), b.cy(0));
-  }
-  
-  void paint_pimg(PImage mat, IVector s) {
-    l.loadPixels();
-    mat.loadPixels();
-    for(int i=max(0, -s.x);i<min(mat.width, l.width-s.x);i++) {
-      for(int j=max(0, -s.y);j<min(mat.height, l.height-s.y);j++) {
-        l.pixels[(i+s.x)+(j+s.y)*l.width] = 
-        mat.pixels[i+j*mat.width];
-      }
-    }
-    l.updatePixels();
-    mat.updatePixels();
-  }
-  
-  void fill_pimg(PImage mat) {
-    l.loadPixels();
-    mat.loadPixels();
-    for(int i=0;i<l.width;i++) {
-      for(int j=0;j<l.height;j++) {
-        l.pixels[i+j*l.width] = 
-        mat.pixels[i%mat.width+(j%mat.height)*mat.width];
-      }
-    }
-    l.updatePixels();
-    mat.updatePixels();
-    
-  }
-  
-  //void paint_img(EImage mat, IVector s) {paint_pimg(mat.l, s);}
-  //void fill_img(EImage mat) {fill_pimg(mat.l);}
-  
-  void fill_color(color col) {
-    l.loadPixels();
-    for(int i=0;i<l.pixels.length;i++) {
-        l.pixels[i] = col;
-    }
-    l.updatePixels();
-  }
-  
-  void paint_color(color col, IVector st, IVector sz) {
-    l.loadPixels();
-    for(int i=max(0, st.x);i<min(st.x+sz.x, l.width);i++) {
-      for(int j=max(0, st.y);j<min(st.y+sz.y, l.height);j++) {
-        l.pixels[i+j*l.width] = col;
-      }
-    }
-    l.updatePixels();
   }
   
 }
