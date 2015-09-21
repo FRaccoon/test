@@ -108,31 +108,37 @@ class MapLayer extends Box {
     return true;
   }
   
-  IVector layer_size() { //このクラスはjavaで作られてます
+  IVector layer_size() {
     JPanel panel = new JPanel();
     panel.setPreferredSize(new Dimension(150, 60));
     panel.setLayout(null);
-  
-    JTextField text1 = new JTextField();
-    panel.add(new JLabel("X"));
-    text1.setBounds(10, 10, 60, 30);
-    panel.add(text1);
     
-    JTextField text2 = new JTextField();
+    JTextField[] text = new JTextField[2];
+    
+    text[0] = new JTextField("50");
+    panel.add(new JLabel("X"));
+    text[0].setBounds(10, 10, 60, 30);
+    panel.add(text[0]);
+    
+    text[1] = new JTextField("50");
     panel.add(new JLabel("Y"));
-    text2.setBounds(80, 10, 60, 30);
-    panel.add(text2);
+    text[1].setBounds(80, 10, 60, 30);
+    panel.add(text[1]);
     
     JOptionPane.showConfirmDialog( null, panel, "layer size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
     
-    IVector g = new IVector(0);
-    try{
-      g.set( int(text1.getText()), int(text2.getText()) );
-    }catch(NumberFormatException e){
-    }catch(NullPointerException e){
+    String[] r = new String[text.length];
+    for(int i=0;i<text.length;i++) {
+      try {
+        r[i] = text[i].getText();
+      } catch(NullPointerException e) {
+        r[i] = "";
+      }
     }
     
-    return g.set(g.x==0?50:g.x, g.y==0?50:g.y);
+    IVector s = new IVector(0);
+    s.set(int(r[0]), int(r[1]));
+    return s.set(s.x==0?50:s.x, s.y==0?50:s.y);
     
   }
   
@@ -248,21 +254,27 @@ class Layers extends ImgDisp {
     ml.e.sb.cp.limit();
   }
   
+  boolean tt(int v) {
+    return (tt==v);
+  }
+  
   void update() {
     if(!inside(mouseX, mouseY))return ;
     
-    if(pr && tt<2) { // edit(pen, eraser)
+    if(pr&&(tt(0)||tt(1))) { // edit(pen, eraser)
       IVector mp = msp(mouseX, mouseY);
       if(et) {
-        if(tt==0) {
+        if(tt(0)) {
           if(ml.e.i.pk('z') && !pm.equals(mp)) {
             get_layer(now).paint(chip, mp);
             pm.set(mp);
           }else {
             mp = mp(mouseX, mouseY);
-            mp.set(mp.get().sub(pm).div(chip.cs).sub(mp.x<pm.x?1:0, mp.y<pm.y?1:0));
-            if(!mp.equals(0)) {
-              mp.set(mp.scl(chip.cs).add(pm));
+            IVector ck = mp.get().sub(pm).div(chip.cs);
+            ck.sub(ck.x==0&&mp.x<pm.x?1:0, ck.y==0&&mp.y<pm.y?1:0);
+            mp.print();
+            if(!ck.equals(0)) {
+              mp.set(ck.scl(chip.cs).add(pm));
               get_layer(now).paint(chip, mp);
               pm.set(mp);
             }
@@ -297,7 +309,7 @@ class Layers extends ImgDisp {
     rect(cx(-a.x), cy(-a.y), cs.x*ml.e.c, cs.y*ml.e.c);
     
     if(inside(mouseX, mouseY)) {
-      if(pr && tt==2) {
+      if(pr && tt(2)) {
         IVector xp = mp(mouseX, mouseY), ip = mp(mouseX, mouseY);
         xp.max(pm);
         ip.min(pm);
@@ -316,7 +328,7 @@ class Layers extends ImgDisp {
           mc.s = new IVector(ml.e.c);
         }
         
-        if(et && tt==0) {
+        if(et && tt(0)) {
           tint(255, 156);
           chip.draw(mc);
           noTint();
@@ -348,7 +360,7 @@ class Layers extends ImgDisp {
     
     pr = true;
     
-    if(tt<2) {
+    if(tt(0)||tt(1)) {
       pm = msp(mouseX, mouseY);
       if(et && tt==0)get_layer(now).paint(chip, pm);
       else if(et)get_layer(now).erase(pm, chip.cs);
@@ -364,7 +376,7 @@ class Layers extends ImgDisp {
     pr = false;
     if(!this.inside(mx, my))return false;
     
-    if(tt==2) {
+    if(tt(2)) {
       Layer l = get_layer(now);
       IVector xp = mp(mx, my), ip = mp(mx, my); //<>//
       xp.max(pm);
@@ -383,7 +395,7 @@ class Layers extends ImgDisp {
   }
   
   void auto_fill(IVector sp) {
-    if(tt>1)return ;
+    if(!tt(0)&&!tt(1))return ;
     int[] dx = { 1, 0,-1, 0}, dy = { 0, 1, 0,-1};
     boolean[][] t = new boolean[cs.x][cs.y];
     for(int i=0;i<cs.x;i++){for(int j=0;j<cs.y;j++){
@@ -465,7 +477,7 @@ class Layers extends ImgDisp {
   }
   
   void fill_layer() {
-    if(tt>1)return ;
+    if(!tt(0)&&!tt(1))return ;
     if(et) {
       if(tt==0)ls.get(now).paint_all(chip);
       else ls.get(now).erase_all();

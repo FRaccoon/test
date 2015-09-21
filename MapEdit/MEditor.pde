@@ -82,6 +82,35 @@ class MEditor extends Box {
     
   }
   
+  String[] input(IVector s, int n, String title, String[] lab, String[] def) {
+    JPanel panel = new JPanel();
+    panel.setPreferredSize(new Dimension(s.x, s.y));
+    panel.setLayout(null);
+    
+    JTextField[] text = new JTextField[n];
+    
+    for(int i=0;i<n;i++) {
+      text[i] = new JTextField(def[i]);
+      panel.add(new JLabel(lab[i]));
+      text[i].setBounds(10, 10, 60, 30);
+      panel.add(text[i]);
+    }
+    
+    JOptionPane.showConfirmDialog( null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+    
+    String[] res = new String[n];
+    
+    for(int i=0;i<n;i++) {
+      try{
+        res[i] = text[i].getText();
+      }catch(NullPointerException e){
+        res[i] = "";
+      }
+    }
+    
+    return res;
+  }
+  
   boolean alert(String str) { //このクラスはjavaで作られてます
     int r = JOptionPane.showConfirmDialog( null, str, "alert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE );
     return (r==JOptionPane.OK_OPTION);

@@ -50,56 +50,74 @@ class EImage {
   }
   
   color get(IVector p) {
-    return l.get(p.x, p.y);
+    return this.l.get(p.x, p.y);
   }
   
   PImage get(IVector p, IVector s) {
-    return l.get(p.x, p.y, s.x, s.y);
+    return this.l.get(p.x, p.y, s.x, s.y);
   }
   
   int wid() {
-    return l.width;
+    return this.l.width;
   }
   
   int hei() {
-    return l.height;
+    return this.l.height;
+  }
+  
+  void load() {
+    this.l.loadPixels();
+  }
+  
+  void update() {
+    this.l.updatePixels();
+  }
+  
+  void set(int i, color c) {
+    //if(!(i<0) && i<wid()*hei())
+    this.l.pixels[i] = c;
+  }
+  
+  void set(int i, int j, color c) {
+    //if( (!(i<0) && i<wid()) && (!(j<0) && i<hei()) )
+    this.set(i+j*wid(), c);
   }
   
   void draw(Box b) {
-    image(l.get(0, 0, min(l.width, b.s.x), min(l.height, b.s.y)), b.cx(0), b.cy(0));
+    image(l.get(0, 0, min(wid(), b.s.x), min(hei(), b.s.y)), b.cx(0), b.cy(0));
   }
   
   void draw(Box b, IVector a) {
     image(
     l.get(a.x, a.y, 
-    min(l.width-a.x, b.s.x), 
-    min(l.height-a.y, b.s.y)), 
+    min(wid()-a.x, b.s.x), 
+    min(hei()-a.y, b.s.y)), 
     b.cx(0), b.cy(0));
   }
   
   void paint_pimg(PImage mat, IVector s) {
-    l.loadPixels();
+    this.load();
     mat.loadPixels();
-    for(int i=max(0, -s.x);i<min(mat.width, l.width-s.x);i++) {
-      for(int j=max(0, -s.y);j<min(mat.height, l.height-s.y);j++) {
-        l.pixels[(i+s.x)+(j+s.y)*l.width] = 
-        mat.pixels[i+j*mat.width];
+    int w=mat.width, h=mat.height;
+    for(int i=max(0, -s.x);i<min(w, wid()-s.x);i++) {
+      for(int j=max(0, -s.y);j<min(h, hei()-s.y);j++) {
+        this.set(i+s.x, j+s.y, mat.pixels[i+j*w]);
       }
     }
-    l.updatePixels();
+    this.update();
     mat.updatePixels();
   }
   
   void fill_pimg(PImage mat) {
-    l.loadPixels();
+    this.load();
     mat.loadPixels();
-    for(int i=0;i<l.width;i++) {
-      for(int j=0;j<l.height;j++) {
-        l.pixels[i+j*l.width] = 
-        mat.pixels[i%mat.width+(j%mat.height)*mat.width];
+    int w=mat.width, h=mat.height;
+    for(int i=0;i<wid();i++) {
+      for(int j=0;j<hei();j++) {
+        this.set(i, j, mat.pixels[i%w+(j%h)*w]);
       }
     }
-    l.updatePixels();
+    this.update();
     mat.updatePixels();
     
   }
@@ -108,21 +126,21 @@ class EImage {
   //void fill_img(EImage mat) {fill_pimg(mat.l);}
   
   void fill_color(color col) {
-    l.loadPixels();
-    for(int i=0;i<l.pixels.length;i++) {
-        l.pixels[i] = col;
+    this.load();
+    for(int i=0;i<wid()*hei();i++) {
+        this.set(i, col);
     }
-    l.updatePixels();
+    this.update();
   }
   
   void paint_color(color col, IVector st, IVector sz) {
-    l.loadPixels();
-    for(int i=max(0, st.x);i<min(st.x+sz.x, l.width);i++) {
-      for(int j=max(0, st.y);j<min(st.y+sz.y, l.height);j++) {
-        l.pixels[i+j*l.width] = col;
+    this.load();
+    for(int i=max(0, st.x);i<min(st.x+sz.x, wid());i++) {
+      for(int j=max(0, st.y);j<min(st.y+sz.y, hei());j++) {
+        this.set(i, j, col);
       }
     }
-    l.updatePixels();
+    this.update();
   }
   
 }
