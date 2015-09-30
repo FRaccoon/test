@@ -114,15 +114,16 @@ class MapLayer extends Box {
     panel.setLayout(null);
     
     JTextField[] text = new JTextField[2];
+    JLabel[] label = new JLabel[2];
     
-    text[0] = new JTextField("50");
-    panel.add(new JLabel("X"));
-    text[0].setBounds(10, 10, 60, 30);
+    label[0] = new JLabel("X");
+    panel.add(label[0]);
+    text[0] = new JTextField("50", 4);
     panel.add(text[0]);
     
-    text[1] = new JTextField("50");
-    panel.add(new JLabel("Y"));
-    text[1].setBounds(80, 10, 60, 30);
+    label[1] = new JLabel("Y");
+    panel.add(label[1]);
+    text[1] = new JTextField("50", 4);
     panel.add(text[1]);
     
     JOptionPane.showConfirmDialog( null, panel, "layer size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
@@ -272,7 +273,6 @@ class Layers extends ImgDisp {
             mp = mp(mouseX, mouseY);
             IVector ck = mp.get().sub(pm).div(chip.cs);
             ck.sub(ck.x==0&&mp.x<pm.x?1:0, ck.y==0&&mp.y<pm.y?1:0);
-            mp.print();
             if(!ck.equals(0)) {
               mp.set(ck.scl(chip.cs).add(pm));
               get_layer(now).paint(chip, mp);
@@ -488,16 +488,29 @@ class Layers extends ImgDisp {
   
   void save() {
     if(!ml.e.alert("Do you want to save?"))return ;
+    
     PGraphics sl = createGraphics(cs.x*ml.e.c, cs.y*ml.e.c); //save_layer
+    String[] str = new String[nl()*cs.y+1];
+    
+    str[0] = cs.x +" "+ cs.y;
+    
     sl.beginDraw();
     //sl.background(0);
     for(int i=0;i<nl();i++) {
-      if(get_layer(i).disp)sl.image(get_layer(i).l, 0, 0);
+      Layer lyr = get_layer(i);
+      if(!lyr.disp)continue;
+      sl.image(lyr.l, 0, 0);
+      for(int j=0;j<cs.y;j++) {
+        str[1+i*cs.y+j] = ""+(lyr.t[0][j]+1);
+        for(int k=1;k<cs.x;k++) str[1+i*cs.y+j] += " "+(lyr.t[k][j]+1);
+      }
     }
     sl.endDraw();
     
     sl.get().save("./data/o/layer.png");
     img.l.get().save("./data/o/mask.png");
+    saveStrings("./data/o/map_data.txt", str);
+    
     //exit();
   }
   
