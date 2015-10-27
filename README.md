@@ -10,6 +10,7 @@ tohu_1 : 豆腐が落ちるだけ
 ### その他  
 Kkai : 某会のアレ  
 noise_game : 音(noise)ゲー  
+minesweeper : マインスイーパー  
 MapEdit : RPGのマップを作る的な [本家(原型が無い)](https://github.com/hotman78/mapEdit)  
 
 ### おまけ  

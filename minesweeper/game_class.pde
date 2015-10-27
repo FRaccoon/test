@@ -5,8 +5,12 @@ class Game {
   IV o, s;
   Box t; // this
   int nb, l; // number of bomb, length of cell
+  int nf;
   
   int st; // 0:start, 1:main, 2:clear, 3:over
+  
+  PImage bg;
+  int wc=0;
   
   Game(int x, int y, int nb, int l) {
     t = new Box(new IV(0, 0), new IV(width, height));
@@ -15,6 +19,8 @@ class Game {
     this.nb = nb;
     this.l = l;
     st=0;
+    bg = loadImage("./data/bg.jpg");
+    bg.resize(t.s.x, t.s.y);
   }
   
   void random_set() {
@@ -36,18 +42,22 @@ class Game {
       }
       b[bx][by] = true;
     }
-    
+    nf=0;
   }
   
   void update() {
   }
   
   void draw() {
+    image(bg, t.p.x, t.p.y);
     textAlign(CENTER, CENTER);
     switch(this.st) {
       case 0:
+        noStroke();
+        fill(192);
+        t.draw();
         textSize(36);
-        fill(255);
+        fill(255,0,0);
         text("press mouse button to start.", 
         t.p.x+t.s.x/2, t.p.y+t.s.y/2);
       break;
@@ -87,26 +97,32 @@ class Game {
           stroke(0);
           fill(255);
         }else {
-          stroke(0);
-          fill(192);
+          if(wc==2)noStroke();
+          else stroke(0);
+          noFill();
         }
         rect(o.x+(i+.02)*l, o.y+(j+.02)*l, l*.96, l*.96);
         
+        if((st!=1 || wc==4) && b[i][j]) {
+          noStroke();
+          fill(255, 0, 0);
+          ellipse(o.x+(i+.5)*l, o.y+(j+.5)*l, l*.7, l*.7);
+        }
+        
         if(a[i][j]>0) {
           textSize(l-2);
-          fill(0);
-          text(a[i][j]+"" ,
+          switch(wc) {
+            case 0:fill(0);break;
+            case 1:fill(255);break;
+            case 3:fill(0,0,255);break;
+            default:fill(0,255,0);break;
+          }
+          if(wc!=2)text(a[i][j]+"" ,
           o.x+(i+.5)*l, o.y+(j+.5)*l);
         }else if(a[i][j]==-2) {
           textSize(l-2);
           fill(0);
           text("F", o.x+(i+.5)*l, o.y+(j+.5)*l);
-        }
-        
-        if(st!=1 && b[i][j]) {
-          noStroke();
-          fill(255, 0, 0);
-          ellipse(o.x+(i+.5)*l, o.y+(j+.5)*l, l*.7, l*.7);
         }
         
       }
@@ -126,12 +142,22 @@ class Game {
       case 1:
         switch(mouseButton) {
           case LEFT:
-            this.open(mx, my);
-            this.isclear();
+            if(wc==3&&a[mx][my]>0) {
+              this.ab(mx, my, 2);
+            }else {
+              this.open(mx, my);
+              this.isclear();
+            }
           break;
           case RIGHT:
-            if(a[mx][my]==-1)a[mx][my]=-2;
-            else if(a[mx][my]==-2)a[mx][my]=-1;
+            if(a[mx][my]==-1) {
+              a[mx][my]=-2;
+              nf++;
+            }else if(a[mx][my]==-2) {
+              a[mx][my]=-1;
+              nf--;
+            }
+            println(nb-nf);
           break;
         }
       break;
@@ -149,7 +175,15 @@ class Game {
         this.random_set();
         st=1;
       break;
-      case 1:break;
+      case 1:
+      switch(key) {
+        case 'a':wc=3;break;
+        case 's':wc=0;break;
+        case 'd':wc=1;break;
+        case 'f':wc=2;break;
+        case 'g':wc=4;break;
+      }
+      break;
       case 2:st=0;break;
       case 3:st=0;break;
       default:break;
@@ -158,26 +192,43 @@ class Game {
   
   void open(int px, int py) {
     if(!(a[px][py]<0) || a[px][py]==-2)return ;
-    a[px][py]=0;
     if(b[px][py]) {
+      a[px][py] = 0;
       st=3;
       return ;
     }
     
-    for(int k=0;k<9;k++) {
-      int rx = px+(k%3-1), ry = py+(int(k/3)-1);
-      if((rx<0 || !(rx<s.x)) || (ry<0 || !(ry<s.y)))continue;
-      if(b[rx][ry])a[px][py]++;
-    }
-    
+    this.ab(px, py, 0);
     if(a[px][py]>0)return;
-    
+    this.ab(px, py, 1);
+  }
+  
+  void ab(int i, int j,int type) {
+    int n=0;
     for(int k=0;k<9;k++) {
-      int rx = px+(k%3-1), ry = py+(int(k/3)-1);
+      int rx = i+(k%3-1), ry = j+(int(k/3)-1);
       if((rx<0 || !(rx<s.x)) || (ry<0 || !(ry<s.y)))continue;
-      this.open(rx, ry);
+      switch(type) {
+        case 0:
+          if(b[rx][ry])n++;
+        break;
+        case 1:
+          this.open(rx, ry);
+        break;
+        case 2:
+          if(a[rx][ry]==-2)n++;
+        break;
+        case 3:
+          if(a[rx][ry]==-1)this.open(rx, ry);
+        break;
+      }
     }
-    
+    switch(type) {
+      case 0:a[i][j]=n;break;
+      case 2:
+      if(a[i][j]==n)ab(i, j, 3);
+      break;
+    }
   }
   
   void isclear() {
