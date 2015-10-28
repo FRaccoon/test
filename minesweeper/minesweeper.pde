@@ -11,7 +11,7 @@ void setup() {
 void draw() {
   background(192);
   
-  game.update();
+  //game.update();
   game.draw();
   
 }

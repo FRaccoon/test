@@ -10,7 +10,7 @@ class Game {
   int st; // 0:start, 1:main, 2:clear, 3:over
   
   PImage bg;
-  int wc=0;
+  int wc;
   
   Game(int x, int y, int nb, int l) {
     t = new Box(new IV(0, 0), new IV(width, height));
@@ -21,6 +21,7 @@ class Game {
     st=0;
     bg = loadImage("./data/bg.jpg");
     bg.resize(t.s.x, t.s.y);
+    wc=0;
   }
   
   void random_set() {
@@ -45,11 +46,9 @@ class Game {
     nf=0;
   }
   
-  void update() {
-  }
+  //void update() {}
   
   void draw() {
-    image(bg, t.p.x, t.p.y);
     textAlign(CENTER, CENTER);
     switch(this.st) {
       case 0:
@@ -67,7 +66,7 @@ class Game {
       case 2:
         this.draw_map();
         noStroke();
-        fill(192, 128);
+        fill(255, 128);
         t.draw();
         textSize(36);
         fill(255,0,0);
@@ -77,7 +76,7 @@ class Game {
       case 3:
         this.draw_map();
         noStroke();
-        fill(192, 128);
+        fill(255, 128);
         t.draw();
         textSize(36);
         fill(255,0,0);
@@ -90,6 +89,7 @@ class Game {
   }
   
   void draw_map() {
+    if(wc!=3)image(bg, t.p.x, t.p.y);
     for(int i=0;i<s.x;i++) {
       for(int j=0;j<s.y;j++) {
         
@@ -103,7 +103,7 @@ class Game {
         }
         rect(o.x+(i+.02)*l, o.y+(j+.02)*l, l*.96, l*.96);
         
-        if((st!=1 || wc==4) && b[i][j]) {
+        if((st==2 || st==3 || wc==4) && b[i][j]) {
           noStroke();
           fill(255, 0, 0);
           ellipse(o.x+(i+.5)*l, o.y+(j+.5)*l, l*.7, l*.7);
@@ -112,10 +112,9 @@ class Game {
         if(a[i][j]>0) {
           textSize(l-2);
           switch(wc) {
-            case 0:fill(0);break;
             case 1:fill(255);break;
-            case 3:fill(0,0,255);break;
-            default:fill(0,255,0);break;
+            case 4:fill(0,0,255);break;
+            default:fill(0);break;
           }
           if(wc!=2)text(a[i][j]+"" ,
           o.x+(i+.5)*l, o.y+(j+.5)*l);
@@ -142,30 +141,26 @@ class Game {
       case 1:
         switch(mouseButton) {
           case LEFT:
-            if(wc==3&&a[mx][my]>0) {
-              this.ab(mx, my, 2);
-            }else {
-              this.open(mx, my);
-              this.isclear();
-            }
+            this.open(mx, my);
+            this.isclear();
           break;
           case RIGHT:
             if(a[mx][my]==-1) {
               a[mx][my]=-2;
               nf++;
+              println(nb-nf);
             }else if(a[mx][my]==-2) {
               a[mx][my]=-1;
               nf--;
+            }else if(a[mx][my]>0){
+              this.ab(mx, my, 2);
             }
-            println(nb-nf);
           break;
         }
       break;
       case 2:st=0;break;
       case 3:st=0;break;
       default:break;
-    }
-    if(st==1) {
     }
   }
   
@@ -177,11 +172,11 @@ class Game {
       break;
       case 1:
       switch(key) {
-        case 'a':wc=3;break;
-        case 's':wc=0;break;
-        case 'd':wc=1;break;
-        case 'f':wc=2;break;
-        case 'g':wc=4;break;
+        case 'a':wc=0;break;
+        case 's':wc=1;break;
+        case 'd':wc=2;break;
+        case 'f':wc=3;break;
+        case 'q':wc=4;break;
       }
       break;
       case 2:st=0;break;
@@ -191,7 +186,7 @@ class Game {
   }
   
   void open(int px, int py) {
-    if(!(a[px][py]<0) || a[px][py]==-2)return ;
+    if(a[px][py]!=-1)return ;
     if(b[px][py]) {
       a[px][py] = 0;
       st=3;
