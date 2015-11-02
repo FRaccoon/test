@@ -11,6 +11,10 @@ tohu_1 : 豆腐が落ちるだけ
 Kkai : 某会のアレ  
 noise_game : 音(noise)ゲー  
 minesweeper : マインスイーパー  
+aoj : aojになるまで文字を出力するだけ(やっつけ)  
+
+### 未完成  
+TDNARABE : 立体四目的な何か  
 MapEdit : RPGのマップを作る的な [本家(原型が無い)](https://github.com/hotman78/mapEdit)  
 
 ### おまけ  
