@@ -21,6 +21,8 @@ class Game {
     dp.draw();
   }
   
+  int n() {return dt.n;}
+  
   void mpe() {}
   void mre() {st.mre();}
   
