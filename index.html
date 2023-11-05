@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>test</title>
+  <style>
+  </style>
+  <script>
+    function gen_link() {
+      const main = document.getElementById("main");
+      main.prepend(document.createElement("br"));
+
+      const adress = document.getElementById("adress").value;
+      if(adress === "") return;
+
+      const a = document.createElement("a");
+      a.innerText = adress;
+      a.setAttribute("href", adress);
+      main.prepend(a);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("btn");
+      btn.addEventListener("click", gen_link);
+    });
+  </script>
+</head>
+<body>
+
+  <input id="adress" value="" />
+  <button id="btn">push</button>
+  <div id="main"></div>
+</body>
+</html>
