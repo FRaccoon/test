@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>test</title>
   <style>
   </style>
@@ -10,13 +11,15 @@
       const main = document.getElementById("main");
       main.prepend(document.createElement("br"));
 
-      const adress = document.getElementById("adress").value;
-      if(adress === "") return;
+      const adress = document.getElementById("adress");
+      if(adress.value === "") return;
 
       const a = document.createElement("a");
-      a.innerText = adress;
-      a.setAttribute("href", adress);
+      a.innerText = adress.value;
+      a.setAttribute("href", adress.value);
       main.prepend(a);
+
+      adress.value = "";
     }
 
     window.addEventListener("DOMContentLoaded", () => {
